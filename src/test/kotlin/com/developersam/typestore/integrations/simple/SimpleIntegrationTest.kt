@@ -1,6 +1,5 @@
 package com.developersam.typestore.integrations.simple
 
-import com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
@@ -29,7 +28,7 @@ class SimpleIntegrationTest {
         assertEquals(3, SimpleEntity.getNotNull(key = newKeyWithUpdate).simpleProp)
         // Batch Create & Update
         SimpleEntity.apply {
-            val es = batchInsert(source = listOf(5L, 6L)) { t, n -> t[SimpleTable.simpleProp] = n}
+            val es = batchInsert(source = listOf(5L, 6L)) { t, n -> t[SimpleTable.simpleProp] = n }
             val size = batchUpdate(entities = es) { t, _ -> t[SimpleTable.simpleProp] = 10 }.size
             assertEquals(2, size)
         }

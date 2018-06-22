@@ -3,6 +3,7 @@ package com.developersam.typestore
 import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.LatLng
 
 /**
  * [TypedTable] represents a set of all entities of the same kind. This class is mostly used for
@@ -125,6 +126,21 @@ open class TypedTable @JvmOverloads protected constructor(tableName: String? = n
      */
     protected fun nullableTimestampProperty(name: String): Property<Timestamp?> =
             Property<Timestamp?>(name = name, type = PropertyType.TIMESTAMP)
+                    .also { registeredProperties.add(element = it) }
+
+    /**
+     * [latLngProperty] declares, registers, and returns a not-null lat-lng property with [name].
+     */
+    protected fun latLngProperty(name: String): Property<LatLng> =
+            Property<LatLng>(name = name, type = PropertyType.LAT_LNG)
+                    .also { registeredProperties.add(element = it) }
+
+    /**
+     * [nullableLatLngProperty] declares, registers, and returns a nullable lat-lng property with
+     * [name].
+     */
+    protected fun nullableLatLngProperty(name: String): Property<LatLng?> =
+            Property<LatLng?>(name = name, type = PropertyType.LAT_LNG)
                     .also { registeredProperties.add(element = it) }
 
 }
