@@ -1,3 +1,3 @@
 package com.developersam.typestore
 
-class EntityClassTest
+class EntityCompanionTest

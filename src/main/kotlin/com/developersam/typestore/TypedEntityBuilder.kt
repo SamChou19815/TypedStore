@@ -1,17 +1,26 @@
 package com.developersam.typestore
 
+import com.developersam.typestore.PropertyType.BLOB
+import com.developersam.typestore.PropertyType.BOOL
+import com.developersam.typestore.PropertyType.DOUBLE
+import com.developersam.typestore.PropertyType.KEY
+import com.developersam.typestore.PropertyType.LAT_LNG
+import com.developersam.typestore.PropertyType.LONG
+import com.developersam.typestore.PropertyType.STRING
+import com.developersam.typestore.PropertyType.TIMESTAMP
 import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.LatLng
 
 /**
  * [TypedEntityBuilder] is responsible for building a [TypedEntity].
  *
  * @param E precise type of the [TypedEntity].
  */
-class TypedEntityBuilder<E: TypedEntity> internal constructor(
-        private val partialBuilder: Entity.Builder, private val creator: TypedEntityCreator<E>
+class TypedEntityBuilder<E : TypedEntity> internal constructor(
+        private val partialBuilder: Entity.Builder
 ) {
 
     /**
@@ -23,24 +32,20 @@ class TypedEntityBuilder<E: TypedEntity> internal constructor(
             return
         }
         when (property.type) {
-            PropertyType.KEY -> partialBuilder.set(property.name, value as Key)
-            PropertyType.LONG -> partialBuilder.set(property.name, value as Long)
-            PropertyType.DOUBLE -> partialBuilder.set(property.name, value as Double)
-            PropertyType.BOOL -> partialBuilder.set(property.name, value as Boolean)
-            PropertyType.STRING -> partialBuilder.set(property.name, value as String)
-            PropertyType.BLOB -> partialBuilder.set(property.name, value as Blob)
-            PropertyType.TIMESTAMP -> partialBuilder.set(property.name, value as Timestamp)
+            KEY -> partialBuilder.set(property.name, value as Key)
+            LONG -> partialBuilder.set(property.name, value as Long)
+            DOUBLE -> partialBuilder.set(property.name, value as Double)
+            BOOL -> partialBuilder.set(property.name, value as Boolean)
+            STRING -> partialBuilder.set(property.name, value as String)
+            BLOB -> partialBuilder.set(property.name, value as Blob)
+            TIMESTAMP -> partialBuilder.set(property.name, value as Timestamp)
+            LAT_LNG -> partialBuilder.set(property.name, value as LatLng)
         }
     }
 
     /**
-     * [buildRawEntity] builds the builder into a raw Datastore [Entity].
+     * [buildEntity] builds the builder into a raw Datastore [Entity].
      */
-    internal fun buildRawEntity(): Entity = partialBuilder.build()
-
-    /**
-     * [build] builds the builder into a full [TypedEntity]
-     */
-    internal fun build(): E = creator.create(entity = buildRawEntity())
+    internal fun buildEntity(): Entity = partialBuilder.build()
 
 }

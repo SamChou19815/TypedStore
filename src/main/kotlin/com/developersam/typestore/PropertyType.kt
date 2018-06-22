@@ -6,5 +6,5 @@ package com.developersam.typestore
  * Currently, it does not contain all the supported types.
  */
 internal enum class PropertyType {
-    KEY, LONG, DOUBLE, BOOL, STRING, BLOB, TIMESTAMP
+    KEY, LONG, DOUBLE, BOOL, STRING, BLOB, TIMESTAMP, LAT_LNG
 }
