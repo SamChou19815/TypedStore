@@ -17,8 +17,10 @@ import com.google.cloud.datastore.StructuredQuery.PropertyFilter
 
 /**
  * [TypedFilter] represents a set of filter adapters provided by this system that is type-safe.
+ *
+ * @param Tbl precise type of the table to apply the filter.
  */
-sealed class TypedFilter {
+sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
 
     /**
      * [asFilter] returns the [Filter] form of this typed filter.
@@ -28,12 +30,14 @@ sealed class TypedFilter {
     /**
      * [and] connects this filter and [other] filter.
      */
-    infix fun and(other: TypedFilter): TypedFilter = And(f1 = this, f2 = other)
+    infix fun and(other: TypedFilter<Tbl>): TypedFilter<Tbl> = And(f1 = this, f2 = other)
 
     /**
      * [Eq] represents a filter that requires the [property] to be equal to [value].
      */
-    internal class Eq<T>(private val property: Property<T>, private val value: T) : TypedFilter() {
+    internal class Eq<Tbl: TypedTable<Tbl>, T>(
+            private val property: Property<Tbl, T>, private val value: T
+    ) : TypedFilter<Tbl>() {
 
         override val asFilter: Filter
             get() {
@@ -58,7 +62,9 @@ sealed class TypedFilter {
     /**
      * [Lt] represents a filter that requires the [property] to be less than [value].
      */
-    internal class Lt<T>(private val property: Property<T>, private val value: T) : TypedFilter() {
+    internal class Lt<Tbl: TypedTable<Tbl>, T>(
+            private val property: Property<Tbl, T>, private val value: T
+    ) : TypedFilter<Tbl>() {
 
         override val asFilter: Filter
             get() {
@@ -82,7 +88,9 @@ sealed class TypedFilter {
     /**
      * [Le] represents a filter that requires the [property] to be less than or equal to [value].
      */
-    internal class Le<T>(private val property: Property<T>, private val value: T) : TypedFilter() {
+    internal class Le<Tbl: TypedTable<Tbl>, T>(
+            private val property: Property<Tbl, T>, private val value: T
+    ) : TypedFilter<Tbl>() {
 
         override val asFilter: Filter
             get() {
@@ -106,7 +114,9 @@ sealed class TypedFilter {
     /**
      * [Gt] represents a filter that requires the [property] to be greater than [value].
      */
-    internal class Gt<T>(private val property: Property<T>, private val value: T) : TypedFilter() {
+    internal class Gt<Tbl: TypedTable<Tbl>, T>(
+            private val property: Property<Tbl, T>, private val value: T
+    ) : TypedFilter<Tbl>() {
 
         override val asFilter: Filter
             get() {
@@ -130,7 +140,9 @@ sealed class TypedFilter {
     /**
      * [Ge] represents a filter that requires the [property] to be greater than or equal to [value].
      */
-    internal class Ge<T>(private val property: Property<T>, private val value: T) : TypedFilter() {
+    internal class Ge<Tbl: TypedTable<Tbl>, T>(
+            private val property: Property<Tbl, T>, private val value: T
+    ) : TypedFilter<Tbl>() {
 
         override val asFilter: Filter
             get() {
@@ -154,7 +166,9 @@ sealed class TypedFilter {
     /**
      * [And] represents a filter that requires the [f1] and [f2] to be both satisfied.
      */
-    private class And(private val f1: TypedFilter, private val f2: TypedFilter) : TypedFilter() {
+    private class And<Tbl: TypedTable<Tbl>>(
+            private val f1: TypedFilter<Tbl>, private val f2: TypedFilter<Tbl>
+    ) : TypedFilter<Tbl>() {
 
         override val asFilter: Filter get() = CompositeFilter.and(f1.asFilter, f2.asFilter)
 

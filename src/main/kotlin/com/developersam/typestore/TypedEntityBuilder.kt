@@ -17,16 +17,21 @@ import com.google.cloud.datastore.LatLng
 /**
  * [TypedEntityBuilder] is responsible for building a [TypedEntity].
  *
+ * @constructor the internal constructor is called by a [partialBuilder] and a [table] associated
+ * with the entity.
+ * @param Tbl precise type of the [table].
  * @param E precise type of the [TypedEntity].
  */
-class TypedEntityBuilder<E : TypedEntity> internal constructor(
-        private val partialBuilder: Entity.Builder
+class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> internal constructor(
+        private val table: Tbl, private val partialBuilder: Entity.Builder
 ) {
+
+    private val registeredProperties: HashSet<Property<Tbl, *>> = hashSetOf()
 
     /**
      * [set] sets the value of the [property] to be [value].
      */
-    operator fun <T> set(property: Property<T>, value: T) {
+    operator fun <T> set(property: Property<Tbl, T>, value: T) {
         if (value == null) {
             partialBuilder.setNull(property.name)
             return
@@ -46,6 +51,11 @@ class TypedEntityBuilder<E : TypedEntity> internal constructor(
     /**
      * [buildEntity] builds the builder into a raw Datastore [Entity].
      */
-    internal fun buildEntity(): Entity = partialBuilder.build()
+    internal fun buildEntity(): Entity {
+        for (property in table.registeredProperties) {
+            TODO(reason = "Either here or somewhere else, check for exhaustiveness.")
+        }
+        return partialBuilder.build()
+    }
 
 }

@@ -26,7 +26,7 @@ object. You specify how to retrieve and update data by DSL-like lambda expressio
 Declaring a table:
 
 ```kotlin
-object FooTable : TypedTable() {
+object FooTable : TypedTable<FooTable>() {
     val bar = stringProperty(name = "bar")
     val answer42 = longProperty(name = "answer")
 }
@@ -39,7 +39,7 @@ Declaring an entity with its companion:
 ```kotlin
 import com.google.cloud.datastore.Entity // We use GCP Datastore entity
 
-class FooEntity(entity: Entity) : TypedEntity(entity = entity) {
+class FooEntity(entity: Entity) : TypedEntity<FooTable>(entity = entity) {
   val bar: String = FooTable.bar.delegatedValue
   val answer42: Long get() = FooTable.answer42.delegatedValue
   
@@ -67,6 +67,24 @@ val updated = FooEntity.update(entity = obj) { it[FooTable.bar] = "Oh, no!" }
 // Delete
 fun d() = FooEntity.delete(updated.key)
 ```
+
+Transaction: 
+
+Assuming your datastore object is `datastore`, you can write an inline function `transaction` in
+this way and simply use it. The code for transaction is put inside the inlined lambda expression.
+
+```kotlin
+inline fun <reified T> transaction(crossinline f: () -> T): T = datastore.transaction(f)
+```
+
+## Notes
+
+- When engineering your application, you should think of this library as a simple wrapper for GCP 
+Datastore. In other words, this library changes the style of your DB related code but does not
+magically solves all your problems. For example, you are still subject to all the constrains on GCP.
+- Currently, caching is not supported.
+- Although you can use this library in plain Java, you will get more verbose syntax and will lose
+the nullability type-check.
 
 ## License
 

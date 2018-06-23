@@ -7,7 +7,7 @@ import com.google.cloud.datastore.StructuredQuery.OrderBy
 /**
  * [TypedQueryBuilder] is a simply container of the datastore query parameters.
  */
-class TypedQueryBuilder internal constructor(table: TypedTable) {
+class TypedQueryBuilder<Tbl: TypedTable<Tbl>> internal constructor(table: Tbl) {
 
     /**
      * [backingBuilder] is the backing field for this type-safe builder.
@@ -18,7 +18,7 @@ class TypedQueryBuilder internal constructor(table: TypedTable) {
     /**
      * [filter] sets the filter.
      */
-    var filter: TypedFilter
+    var filter: TypedFilter<Tbl>
         get() = throw UnsupportedOperationException()
         set(value) {
             backingBuilder.setFilter(value.asFilter)

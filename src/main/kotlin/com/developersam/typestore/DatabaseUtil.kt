@@ -49,3 +49,9 @@ inline fun <reified T> Datastore.transaction(crossinline f: () -> T): T {
         }
     }
 }
+
+/**
+ * [transaction] is the syntactic sugar for using [Datastore.transaction] for using the default
+ * datastore.
+ */
+inline fun <reified T> transaction(crossinline f: () -> T): T = defaultDatastore.transaction(f)
