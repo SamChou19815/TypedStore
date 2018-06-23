@@ -19,19 +19,32 @@ import com.google.cloud.datastore.LatLng
  *
  * @constructor the internal constructor is called by a [partialBuilder] and a [table] associated
  * with the entity.
+ * @property table the table associated with the builder.
+ * @property partialBuilder the partially constructed builder.
+ * @property unusedProperties the properties that have not been set by the user.
  * @param Tbl precise type of the [table].
  * @param E precise type of the [TypedEntity].
  */
-class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> internal constructor(
-        private val table: Tbl, private val partialBuilder: Entity.Builder
+class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private constructor(
+        private val table: Tbl, private val partialBuilder: Entity.Builder,
+        private val unusedProperties: HashSet<Property<Tbl, *>>
 ) {
 
-    private val registeredProperties: HashSet<Property<Tbl, *>> = hashSetOf()
+    internal constructor(table: Tbl, newKey: Key) : this(
+            table = table, partialBuilder = Entity.newBuilder(newKey),
+            unusedProperties = hashSetOf()
+    )
+
+    internal constructor(table: Tbl, existingEntity: E) : this(
+            table = table, partialBuilder = Entity.newBuilder(existingEntity.entity),
+            unusedProperties = HashSet(table.registeredProperties)
+    )
 
     /**
      * [set] sets the value of the [property] to be [value].
      */
     operator fun <T> set(property: Property<Tbl, T>, value: T) {
+        unusedProperties.remove(element = property)
         if (value == null) {
             partialBuilder.setNull(property.name)
             return
@@ -50,10 +63,12 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> internal c
 
     /**
      * [buildEntity] builds the builder into a raw Datastore [Entity].
+     *
+     * If some fields are not properly declared, an [IllegalStateException] will be thrown.
      */
     internal fun buildEntity(): Entity {
-        for (property in table.registeredProperties) {
-            TODO(reason = "Either here or somewhere else, check for exhaustiveness.")
+        if (unusedProperties.isNotEmpty()) {
+            throw IllegalStateException("Some property has not been declared. This is bad.")
         }
         return partialBuilder.build()
     }

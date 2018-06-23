@@ -54,6 +54,7 @@ Sample CRUD:
 ```kotlin
 // Create
 val obj = FooEntity.insert { 
+    // You need to explicitly declare all the fields. Otherwise, it will throw an exception.
     it[FooTable.bar] = "haha"
     it[FooTable.answer42] = 42
 }

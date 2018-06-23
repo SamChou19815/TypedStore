@@ -82,8 +82,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      */
     fun insert(parent: Key? = null, builder: (TypedEntityBuilder<Tbl, E>) -> Unit): E {
         val newKey = createNewKey(parent = parent)
-        val newEntity = Entity.newBuilder(newKey)
-                .let { TypedEntityBuilder<Tbl, E>(table = table, partialBuilder = it) }
+        val newEntity = TypedEntityBuilder<Tbl, E>(table = table, newKey = newKey)
                 .apply(block = builder)
                 .buildEntity()
         return datastore.add(newEntity).let { create(entity = it) }
@@ -99,8 +98,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
             builder: (TypedEntityBuilder<Tbl, E>, T) -> Unit
     ): List<E> {
         val newEntities = source.map { s ->
-            Entity.newBuilder(createNewKey(parent = parent))
-                    .let { TypedEntityBuilder<Tbl, E>(partialBuilder = it, table = table) }
+            TypedEntityBuilder<Tbl, E>(table = table, newKey = createNewKey(parent = parent))
                     .apply { builder(this, s) }
                     .buildEntity()
         }
@@ -112,8 +110,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * database and returns the updated entity.
      */
     fun update(entity: E, builder: (TypedEntityBuilder<Tbl, E>) -> Unit): E {
-        val updatedEntity = Entity.newBuilder(entity.entity)
-                .let { TypedEntityBuilder<Tbl, E>(table = table, partialBuilder = it) }
+        val updatedEntity = TypedEntityBuilder(table = table, existingEntity = entity)
                 .apply(block = builder)
                 .buildEntity()
         return datastore.put(updatedEntity).let { create(entity = it) }
@@ -125,8 +122,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      */
     fun batchUpdate(entities: List<E>, builder: (TypedEntityBuilder<Tbl, E>, E) -> Unit): List<E> {
         val updatedEntities = entities.map { e ->
-            Entity.newBuilder(e.entity)
-                    .let { TypedEntityBuilder<Tbl, E>(table = table, partialBuilder = it) }
+            TypedEntityBuilder(table = table, existingEntity = e)
                     .apply { builder(this, e) }
                     .buildEntity()
         }
