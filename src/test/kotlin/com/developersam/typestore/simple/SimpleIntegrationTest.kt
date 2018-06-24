@@ -1,4 +1,4 @@
-package com.developersam.typestore.integrations.simple
+package com.developersam.typestore.simple
 
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue

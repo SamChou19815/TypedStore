@@ -1,4 +1,4 @@
-package com.developersam.typestore.integrations.simple
+package com.developersam.typestore.simple
 
 import com.developersam.typestore.TypedEntity
 import com.developersam.typestore.TypedEntityCompanion
