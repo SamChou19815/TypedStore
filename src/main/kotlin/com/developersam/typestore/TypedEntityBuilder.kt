@@ -6,6 +6,7 @@ import com.developersam.typestore.PropertyType.DOUBLE
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
+import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
 import com.developersam.typestore.PropertyType.TIMESTAMP
 import com.google.cloud.Timestamp
@@ -13,6 +14,7 @@ import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.LatLng
+import com.google.cloud.datastore.StringValue
 
 /**
  * [TypedEntityBuilder] is responsible for building a [TypedEntity].
@@ -55,6 +57,11 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private co
             DOUBLE -> partialBuilder.set(property.name, value as Double)
             BOOL -> partialBuilder.set(property.name, value as Boolean)
             STRING -> partialBuilder.set(property.name, value as String)
+            LONG_STRING -> {
+                val stringValue = StringValue.newBuilder(value as String)
+                        .setExcludeFromIndexes(true).build()
+                partialBuilder.set(property.name, stringValue)
+            }
             BLOB -> partialBuilder.set(property.name, value as Blob)
             TIMESTAMP -> partialBuilder.set(property.name, value as Timestamp)
             LAT_LNG -> partialBuilder.set(property.name, value as LatLng)

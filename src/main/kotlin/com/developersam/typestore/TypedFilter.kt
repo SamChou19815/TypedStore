@@ -6,11 +6,13 @@ import com.developersam.typestore.PropertyType.DOUBLE
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
+import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
 import com.developersam.typestore.PropertyType.TIMESTAMP
 import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.StringValue
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter
 import com.google.cloud.datastore.StructuredQuery.Filter
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter
@@ -53,7 +55,9 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     STRING -> PropertyFilter.eq(property.name, value as String)
                     BLOB -> PropertyFilter.eq(property.name, value as Blob)
                     TIMESTAMP -> PropertyFilter.eq(property.name, value as Timestamp)
-                    LAT_LNG -> throw UnsupportedOperationException("LAT_LANG is not supported.")
+                    else -> throw UnsupportedOperationException(
+                            "${property.type.name} is unsupported."
+                    )
                 }
             }
 
@@ -79,7 +83,9 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     STRING -> PropertyFilter.lt(property.name, value as String)
                     BLOB -> PropertyFilter.lt(property.name, value as Blob)
                     TIMESTAMP -> PropertyFilter.lt(property.name, value as Timestamp)
-                    LAT_LNG -> throw UnsupportedOperationException("LAT_LANG is not supported.")
+                    else -> throw UnsupportedOperationException(
+                            "${property.type.name} is unsupported."
+                    )
                 }
             }
 
@@ -105,7 +111,9 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     STRING -> PropertyFilter.le(property.name, value as String)
                     BLOB -> PropertyFilter.le(property.name, value as Blob)
                     TIMESTAMP -> PropertyFilter.le(property.name, value as Timestamp)
-                    LAT_LNG -> throw UnsupportedOperationException("LAT_LANG is not supported.")
+                    else -> throw UnsupportedOperationException(
+                            "${property.type.name} is unsupported."
+                    )
                 }
             }
 
@@ -131,7 +139,9 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     STRING -> PropertyFilter.gt(property.name, value as String)
                     BLOB -> PropertyFilter.gt(property.name, value as Blob)
                     TIMESTAMP -> PropertyFilter.gt(property.name, value as Timestamp)
-                    LAT_LNG -> throw UnsupportedOperationException("LAT_LANG is not supported.")
+                    else -> throw UnsupportedOperationException(
+                            "${property.type.name} is unsupported."
+                    )
                 }
             }
 
@@ -157,7 +167,9 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     STRING -> PropertyFilter.ge(property.name, value as String)
                     BLOB -> PropertyFilter.ge(property.name, value as Blob)
                     TIMESTAMP -> PropertyFilter.ge(property.name, value as Timestamp)
-                    LAT_LNG -> throw UnsupportedOperationException("LAT_LANG is not supported.")
+                    else -> throw UnsupportedOperationException(
+                            "${property.type.name} is unsupported."
+                    )
                 }
             }
 

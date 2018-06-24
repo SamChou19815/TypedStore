@@ -131,6 +131,26 @@ open class TypedTable<Tbl: TypedTable<Tbl>> protected constructor(tableName: Str
                     .also { register(property = it) }
 
     /**
+     * [longStringProperty] declares, registers, and returns a not-null long string property with
+     * [name].
+     *
+     * @throws IllegalArgumentException if the property with this name is already registered.
+     */
+    protected fun longStringProperty(name: String): Property<Tbl, String> =
+            Property<Tbl, String>(name = name, type = PropertyType.LONG_STRING)
+                    .also { register(property = it) }
+
+    /**
+     * [nullableLongStringProperty] declares, registers, and returns a nullable long string property
+     * with [name].
+     *
+     * @throws IllegalArgumentException if the property with this name is already registered.
+     */
+    protected fun nullableLongStringProperty(name: String): Property<Tbl, String?> =
+            Property<Tbl, String?>(name = name, type = PropertyType.LONG_STRING)
+                    .also { register(property = it) }
+
+    /**
      * [blobProperty] declares, registers, and returns a not-null blob property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.

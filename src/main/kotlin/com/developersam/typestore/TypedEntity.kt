@@ -6,10 +6,12 @@ import com.developersam.typestore.PropertyType.DOUBLE
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
+import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
 import com.developersam.typestore.PropertyType.TIMESTAMP
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.StringValue
 
 /**
  * [TypedEntity] represents an entity with full data from the datastore in [entity].
@@ -44,6 +46,7 @@ abstract class TypedEntity<Tbl : TypedTable<Tbl>> protected constructor(val enti
                 DOUBLE -> safeDelegate(Entity::getDouble)
                 BOOL -> safeDelegate(Entity::getBoolean)
                 STRING -> safeDelegate(Entity::getString)
+                LONG_STRING -> safeDelegate { name -> getValue<StringValue>(name).get() }
                 BLOB -> safeDelegate(Entity::getBlob)
                 TIMESTAMP -> safeDelegate(Entity::getTimestamp)
                 LAT_LNG -> safeDelegate(Entity::getLatLng)
