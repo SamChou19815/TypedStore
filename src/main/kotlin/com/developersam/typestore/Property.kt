@@ -1,6 +1,19 @@
 package com.developersam.typestore
 
+import com.developersam.typestore.PropertyType.BLOB
+import com.developersam.typestore.PropertyType.BOOL
+import com.developersam.typestore.PropertyType.DATE_TIME
+import com.developersam.typestore.PropertyType.DOUBLE
+import com.developersam.typestore.PropertyType.KEY
+import com.developersam.typestore.PropertyType.LAT_LNG
+import com.developersam.typestore.PropertyType.LONG
+import com.developersam.typestore.PropertyType.LONG_STRING
+import com.developersam.typestore.PropertyType.STRING
+import com.google.cloud.datastore.Blob
+import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.LatLng
 import com.google.cloud.datastore.StructuredQuery.OrderBy
+import java.time.LocalDateTime
 
 /**
  * [Property] represents a property in the entity with a specified type.
@@ -10,7 +23,7 @@ import com.google.cloud.datastore.StructuredQuery.OrderBy
  * @param Tbl type of the table.
  * @param T type of the property.
  */
-class Property<Tbl: TypedTable<Tbl>, T> internal constructor(
+sealed class Property<Tbl : TypedTable<Tbl>, T>(
         internal val name: String, internal val type: PropertyType
 ) {
 
@@ -58,5 +71,141 @@ class Property<Tbl: TypedTable<Tbl>, T> internal constructor(
      * [desc] returns an order on this property in descending order.
      */
     fun desc(): OrderBy = OrderBy.desc(name)
+
+    /**
+     * [KeyProperty] is the not-null key property.
+     */
+    class KeyProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Key>(name = name, type = KEY)
+
+    /**
+     * [NullableKeyProperty] is the nullable key property.
+     */
+    class NullableKeyProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Key?>(name = name, type = KEY)
+
+    /**
+     * [LongProperty] is the not-null long property.
+     */
+    class LongProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Long>(name = name, type = LONG)
+
+    /**
+     * [NullableLongProperty] is the nullable long property.
+     */
+    class NullableLongProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Long?>(name = name, type = LONG)
+
+    /**
+     * [DoubleProperty] is the not-null double property.
+     */
+    class DoubleProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Double>(name = name, type = DOUBLE)
+
+    /**
+     * [NullableDoubleProperty] is the nullable double property.
+     */
+    class NullableDoubleProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Double?>(name = name, type = DOUBLE)
+
+    /**
+     * [BoolProperty] is the not-null boolean property.
+     */
+    class BoolProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Boolean>(name = name, type = BOOL)
+
+    /**
+     * [NullableBoolProperty] is the nullable boolean property.
+     */
+    class NullableBoolProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Boolean?>(name = name, type = BOOL)
+
+    /**
+     * [StringProperty] is the not-null string property.
+     */
+    class StringProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, String>(name = name, type = STRING)
+
+    /**
+     * [NullableStringProperty] is the not-null string property.
+     */
+    class NullableStringProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, String?>(name = name, type = STRING)
+
+    /**
+     * [LongStringProperty] is the nullable string property.
+     */
+    class LongStringProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, String>(name = name, type = LONG_STRING)
+
+    /**
+     * [NullableLongStringProperty] is the nullable string property.
+     */
+    class NullableLongStringProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, String?>(name = name, type = LONG_STRING)
+
+    /**
+     * [DateTimeProperty] is the not-null date-time property.
+     */
+    class DateTimeProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, LocalDateTime>(name = name, type = DATE_TIME) {
+
+        /**
+         * [isPast] creates and returns a filter that returns all datetime in the past.
+         * It assumes that the datetime is recorded in UTC timezone.
+         */
+        fun isPast(): TypedFilter<Tbl> = TypedFilter.Lt(property = this, value = nowInUTC())
+
+        /**
+         * [isFuture] creates and returns a filter that returns all datetime in the future.
+         * It assumes that the datetime is recorded in UTC timezone.
+         */
+        fun isFuture(): TypedFilter<Tbl> = TypedFilter.Gt(property = this, value = nowInUTC())
+
+    }
+
+    /**
+     * [NullableDateTimeProperty] is the nullable date-time property.
+     */
+    class NullableDateTimeProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, LocalDateTime?>(name = name, type = DATE_TIME) {
+
+        /**
+         * [isPast] creates and returns a filter that returns all datetime in the past.
+         * It assumes that the datetime is recorded in UTC timezone.
+         */
+        fun isPast(): TypedFilter<Tbl> = TypedFilter.Lt(property = this, value = nowInUTC())
+
+        /**
+         * [isFuture] creates and returns a filter that returns all datetime in the future.
+         * It assumes that the datetime is recorded in UTC timezone.
+         */
+        fun isFuture(): TypedFilter<Tbl> = TypedFilter.Gt(property = this, value = nowInUTC())
+
+    }
+
+    /**
+     * [BlobProperty] is the not-null blob property.
+     */
+    class BlobProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Blob>(name = name, type = BLOB)
+
+    /**
+     * [NullableBlobProperty] is the nullable blob property.
+     */
+    class NullableBlobProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, Blob?>(name = name, type = BLOB)
+
+    /**
+     * [LatLngProperty] is the not-null lat-lng property.
+     */
+    class LatLngProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, LatLng>(name = name, type = LAT_LNG)
+
+    /**
+     * [NullableLatLngProperty] is the nullable lat-lng property.
+     */
+    class NullableLatLngProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
+            Property<Tbl, LatLng?>(name = name, type = LAT_LNG)
 
 }

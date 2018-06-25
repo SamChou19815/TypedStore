@@ -9,7 +9,6 @@ import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
 import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
-import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key

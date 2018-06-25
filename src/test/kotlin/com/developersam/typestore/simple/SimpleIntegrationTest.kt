@@ -1,5 +1,6 @@
 package com.developersam.typestore.simple
 
+import com.developersam.typestore.nowInUTC
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
@@ -16,14 +17,13 @@ class SimpleIntegrationTest {
         // Create
         val obj = SimpleEntity.insert {
             it[SimpleTable.simpleProp] = 1
-            it[SimpleTable.simpleDate] = LocalDateTime.now()
+            it[SimpleTable.simpleDate] = nowInUTC()
         }
         val key = obj.key
         // Read
         val objFromKey = SimpleEntity.getNotNull(key = key)
-        val earlyDateTime = LocalDateTime.of(2000, 1, 1, 1, 1)
         val objFromQuery = SimpleEntity.query {
-            filter = (SimpleTable.simpleProp eq 1) and (SimpleTable.simpleDate ge earlyDateTime)
+            filter = (SimpleTable.simpleProp eq 1) and SimpleTable.simpleDate.isPast()
         }.first()
         assertEquals(objFromKey.simpleProp, objFromQuery.simpleProp)
         // Update
@@ -37,7 +37,7 @@ class SimpleIntegrationTest {
         SimpleEntity.apply {
             val es = batchInsert(source = listOf(5L, 6L)) { t, n ->
                 t[SimpleTable.simpleProp] = n
-                t[SimpleTable.simpleDate] = LocalDateTime.now()
+                t[SimpleTable.simpleDate] = nowInUTC()
             }
             val size = batchUpdate(entities = es) { t, _ -> t[SimpleTable.simpleProp] = 10 }.size
             assertEquals(2, size)
