@@ -1,5 +1,6 @@
 package com.developersam.typestore
 
+import com.developersam.typestore.Property.EnumProperty
 import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
 import com.developersam.typestore.PropertyType.DATE_TIME
@@ -10,7 +11,6 @@ import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
 import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
-import com.developersam.typestore.Property.*
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.StringValue
@@ -21,7 +21,9 @@ import com.google.cloud.datastore.StringValue
  * @property entity the entity for GCP datastore.
  * @param Tbl the type of that table the entity is associated to.
  */
-abstract class TypedEntity<Tbl : TypedTable<Tbl>> protected constructor(val entity: Entity) {
+abstract class TypedEntity<Tbl : TypedTable<Tbl>> protected constructor(
+        @field:Transient val entity: Entity
+) {
 
     /**
      * [key] returns the key of the entity.
