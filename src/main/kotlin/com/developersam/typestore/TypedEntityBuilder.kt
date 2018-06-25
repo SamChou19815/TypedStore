@@ -4,6 +4,7 @@ import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
 import com.developersam.typestore.PropertyType.DATE_TIME
 import com.developersam.typestore.PropertyType.DOUBLE
+import com.developersam.typestore.PropertyType.ENUM
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
@@ -62,6 +63,7 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private co
                         .setExcludeFromIndexes(true).build()
                 partialBuilder.set(property.name, stringValue)
             }
+            ENUM -> partialBuilder.set(property.name, (value as Enum<*>).name)
             BLOB -> partialBuilder.set(property.name, value as Blob)
             DATE_TIME -> {
                 val datetime = value as LocalDateTime

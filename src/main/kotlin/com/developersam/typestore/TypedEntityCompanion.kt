@@ -54,7 +54,18 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     fun all(): Sequence<E> = query(builder = {})
 
     /**
-     * [query] uses the given query builder [builder] to constructor a query and returns the result
+     * [query] uses the given [ancestor] key and the given query [builder] to construct a query and
+     * returns the result in sequence.
+     */
+    fun query(ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}): Sequence<E> =
+            TypedAncestorQueryBuilder(table = table, ancestor = ancestor).apply(builder)
+                    .build()
+                    .let { datastore.run(it) }
+                    .asSequence()
+                    .map(transform = ::create)
+
+    /**
+     * [query] uses the given query builder [builder] to construct a query and returns the result
      * in sequence.
      */
     fun query(builder: TypedQueryBuilder<Tbl>.() -> Unit): Sequence<E> =

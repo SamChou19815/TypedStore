@@ -4,11 +4,13 @@ import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
 import com.developersam.typestore.PropertyType.DATE_TIME
 import com.developersam.typestore.PropertyType.DOUBLE
+import com.developersam.typestore.PropertyType.ENUM
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
 import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
+import com.developersam.typestore.Property.*
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.StringValue
@@ -47,6 +49,10 @@ abstract class TypedEntity<Tbl : TypedTable<Tbl>> protected constructor(val enti
                 BOOL -> safeDelegate(Entity::getBoolean)
                 STRING -> safeDelegate(Entity::getString)
                 LONG_STRING -> safeDelegate { getValue<StringValue>(it).get() }
+                ENUM -> safeDelegate { name ->
+                    val enumProp = this@delegatedValue as EnumProperty
+                    enumProp.valueOf(getString(name))
+                }
                 BLOB -> safeDelegate(Entity::getBlob)
                 DATE_TIME -> safeDelegate { getTimestamp(it).toLocalDateTime() }
                 LAT_LNG -> safeDelegate(Entity::getLatLng)

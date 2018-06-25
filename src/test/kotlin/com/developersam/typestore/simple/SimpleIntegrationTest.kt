@@ -18,12 +18,14 @@ class SimpleIntegrationTest {
         val obj = SimpleEntity.insert {
             it[SimpleTable.simpleProp] = 1
             it[SimpleTable.simpleDate] = nowInUTC()
+            it[SimpleTable.simpleEnum] = SimpleEnum.A
         }
         val key = obj.key
         // Read
         val objFromKey = SimpleEntity.getNotNull(key = key)
         val objFromQuery = SimpleEntity.query {
-            filter = (SimpleTable.simpleProp eq 1) and SimpleTable.simpleDate.isPast()
+            filter = (SimpleTable.simpleProp eq 1) and SimpleTable.simpleDate.isPast() and
+                    (SimpleTable.simpleEnum eq SimpleEnum.A)
         }.first()
         assertEquals(objFromKey.simpleProp, objFromQuery.simpleProp)
         // Update
@@ -38,6 +40,7 @@ class SimpleIntegrationTest {
             val es = batchInsert(source = listOf(5L, 6L)) { t, n ->
                 t[SimpleTable.simpleProp] = n
                 t[SimpleTable.simpleDate] = nowInUTC()
+                t[SimpleTable.simpleEnum] = SimpleEnum.B
             }
             val size = batchUpdate(entities = es) { t, _ -> t[SimpleTable.simpleProp] = 10 }.size
             assertEquals(2, size)

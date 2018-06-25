@@ -4,6 +4,7 @@ import com.developersam.typestore.Property.BlobProperty
 import com.developersam.typestore.Property.BoolProperty
 import com.developersam.typestore.Property.DateTimeProperty
 import com.developersam.typestore.Property.DoubleProperty
+import com.developersam.typestore.Property.EnumProperty
 import com.developersam.typestore.Property.KeyProperty
 import com.developersam.typestore.Property.LatLngProperty
 import com.developersam.typestore.Property.LongProperty
@@ -152,6 +153,15 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      */
     protected fun nullableLongStringProperty(name: String): NullableLongStringProperty<Tbl> =
             NullableLongStringProperty<Tbl>(name = name).also { register(property = it) }
+
+    /**
+     * [enumProperty] declares, registers, and returns a not-null enum property with [name] and
+     * [clazz].
+     *
+     * @throws IllegalArgumentException if the property with this name is already registered.
+     */
+    protected fun <E: Enum<E>> enumProperty(name: String, clazz: Class<E>): EnumProperty<Tbl, E> =
+            EnumProperty<Tbl, E>(name = name, clazz = clazz).also { register(property = it) }
 
     /**
      * [datetimeProperty] declares, registers, and returns a not-null date-time property with

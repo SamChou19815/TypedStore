@@ -4,6 +4,7 @@ import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
 import com.developersam.typestore.PropertyType.DATE_TIME
 import com.developersam.typestore.PropertyType.DOUBLE
+import com.developersam.typestore.PropertyType.ENUM
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
@@ -143,6 +144,27 @@ sealed class Property<Tbl : TypedTable<Tbl>, T>(
      */
     class NullableLongStringProperty<Tbl : TypedTable<Tbl>> internal constructor(name: String) :
             Property<Tbl, String?>(name = name, type = LONG_STRING)
+
+    /**
+     * [EnumProperty] is the not-null enum property.
+     *
+     * @param E the precise type of the enum.
+     */
+    class EnumProperty<Tbl : TypedTable<Tbl>, E : Enum<E>> internal constructor(
+            name: String, clazz: Class<E>
+    ) : Property<Tbl, E>(name = name, type = ENUM) {
+
+        /**
+         * [values] is the collection of all enum values.
+         */
+        private val values: Array<E> = clazz.enumConstants
+
+        /**
+         * [valueOf] returns the enum corresponds to [s].
+         */
+        fun valueOf(s: String): E = values.first { it.name == s }
+
+    }
 
     /**
      * [DateTimeProperty] is the not-null date-time property.

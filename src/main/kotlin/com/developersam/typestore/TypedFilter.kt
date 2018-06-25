@@ -4,6 +4,7 @@ import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
 import com.developersam.typestore.PropertyType.DATE_TIME
 import com.developersam.typestore.PropertyType.DOUBLE
+import com.developersam.typestore.PropertyType.ENUM
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LONG
 import com.developersam.typestore.PropertyType.STRING
@@ -50,6 +51,7 @@ sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
                     DOUBLE -> PropertyFilter.eq(property.name, value as Double)
                     BOOL -> PropertyFilter.eq(property.name, value as Boolean)
                     STRING -> PropertyFilter.eq(property.name, value as String)
+                    ENUM -> PropertyFilter.eq(property.name, (value as Enum<*>).name)
                     BLOB -> PropertyFilter.eq(property.name, value as Blob)
                     DATE_TIME ->
                         PropertyFilter.eq(property.name, (value as LocalDateTime).toGcpTimestamp())
@@ -79,6 +81,7 @@ sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
                     DOUBLE -> PropertyFilter.lt(property.name, value as Double)
                     BOOL -> PropertyFilter.lt(property.name, value as Boolean)
                     STRING -> PropertyFilter.lt(property.name, value as String)
+                    ENUM -> PropertyFilter.lt(property.name, (value as Enum<*>).name)
                     BLOB -> PropertyFilter.lt(property.name, value as Blob)
                     DATE_TIME ->
                         PropertyFilter.lt(property.name, (value as LocalDateTime).toGcpTimestamp())
@@ -108,6 +111,7 @@ sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
                     DOUBLE -> PropertyFilter.le(property.name, value as Double)
                     BOOL -> PropertyFilter.le(property.name, value as Boolean)
                     STRING -> PropertyFilter.le(property.name, value as String)
+                    ENUM -> PropertyFilter.le(property.name, (value as Enum<*>).name)
                     BLOB -> PropertyFilter.le(property.name, value as Blob)
                     DATE_TIME ->
                         PropertyFilter.le(property.name, (value as LocalDateTime).toGcpTimestamp())
@@ -137,6 +141,7 @@ sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
                     DOUBLE -> PropertyFilter.gt(property.name, value as Double)
                     BOOL -> PropertyFilter.gt(property.name, value as Boolean)
                     STRING -> PropertyFilter.gt(property.name, value as String)
+                    ENUM -> PropertyFilter.gt(property.name, (value as Enum<*>).name)
                     BLOB -> PropertyFilter.gt(property.name, value as Blob)
                     DATE_TIME ->
                         PropertyFilter.gt(property.name, (value as LocalDateTime).toGcpTimestamp())
@@ -166,6 +171,7 @@ sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
                     DOUBLE -> PropertyFilter.ge(property.name, value as Double)
                     BOOL -> PropertyFilter.ge(property.name, value as Boolean)
                     STRING -> PropertyFilter.ge(property.name, value as String)
+                    ENUM -> PropertyFilter.ge(property.name, (value as Enum<*>).name)
                     BLOB -> PropertyFilter.ge(property.name, value as Blob)
                     DATE_TIME ->
                         PropertyFilter.ge(property.name, (value as LocalDateTime).toGcpTimestamp())

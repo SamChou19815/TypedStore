@@ -27,7 +27,7 @@ fun DatastoreOptions.Builder.setupLocalDevIfOnLocal() {
  */
 val defaultDatastore: Datastore = DatastoreOptions
         .newBuilder()
-        .apply(block = DatastoreOptions.Builder::setupLocalDevIfOnLocal)
+        .apply { setupLocalDevIfOnLocal() }
         .build().service
 
 /**
