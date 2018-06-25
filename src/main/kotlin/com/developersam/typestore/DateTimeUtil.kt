@@ -1,6 +1,7 @@
 package com.developersam.typestore
 
 import com.google.cloud.Timestamp
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -42,6 +43,12 @@ fun parseToUTCTime(userTime: String, userTimezoneOffset: Int): LocalDateTime {
     val userZoneId = ZoneId.ofOffset("UTC", ZoneOffset.ofHours(userTimezoneOffset))
     return userDate.atZone(userZoneId).toUTCTime()
 }
+
+/**
+ * [toLocalDateTime] returns the [LocalDateTime] in UTC that is equivalent to [date].
+ */
+fun toLocalDateTimeInUTC(date: Long): LocalDateTime =
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(date), utcZoneId)
 
 /**
  * [LocalDateTime.toUTCMillis] assumes this local date time is in UTC and converts it to a long that
