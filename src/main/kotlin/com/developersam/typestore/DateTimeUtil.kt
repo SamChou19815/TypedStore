@@ -42,3 +42,9 @@ fun parseToUTCTime(userTime: String, userTimezoneOffset: Int): LocalDateTime {
     val userZoneId = ZoneId.ofOffset("UTC", ZoneOffset.ofHours(userTimezoneOffset))
     return userDate.atZone(userZoneId).toUTCTime()
 }
+
+/**
+ * [LocalDateTime.toUTCMillis] assumes this local date time is in UTC and converts it to a long that
+ * represents the current time passed since 1970.
+ */
+fun LocalDateTime.toUTCMillis(): Long = toInstant(ZoneOffset.UTC).toEpochMilli()
