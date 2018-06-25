@@ -1,9 +1,9 @@
 package com.developersam.typestore
 
-import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.LatLng
+import java.time.LocalDateTime
 
 /**
  * [TypedTable] represents a set of all entities of the same kind. This class is mostly used for
@@ -13,7 +13,7 @@ import com.google.cloud.datastore.LatLng
  * to the simple. name of the class.
  * @param Tbl type of the table.
  */
-open class TypedTable<Tbl: TypedTable<Tbl>> protected constructor(tableName: String? = null) {
+open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: String? = null) {
 
     /**
      * [tableName] returns the name of the table.
@@ -170,23 +170,23 @@ open class TypedTable<Tbl: TypedTable<Tbl>> protected constructor(tableName: Str
                     .also { register(property = it) }
 
     /**
-     * [timestampProperty] declares, registers, and returns a not-null timestamp property with
+     * [datetimeProperty] declares, registers, and returns a not-null date-time property with
      * [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun timestampProperty(name: String): Property<Tbl, Timestamp> =
-            Property<Tbl, Timestamp>(name = name, type = PropertyType.TIMESTAMP)
+    protected fun datetimeProperty(name: String): Property<Tbl, LocalDateTime> =
+            Property<Tbl, LocalDateTime>(name = name, type = PropertyType.DATE_TIME)
                     .also { register(property = it) }
 
     /**
-     * [nullableTimestampProperty] declares, registers, and returns a nullable timestamp property
+     * [nullableDatetimeProperty] declares, registers, and returns a nullable date-time property
      * with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableTimestampProperty(name: String): Property<Tbl, Timestamp?> =
-            Property<Tbl, Timestamp?>(name = name, type = PropertyType.TIMESTAMP)
+    protected fun nullableDatetimeProperty(name: String): Property<Tbl, LocalDateTime?> =
+            Property<Tbl, LocalDateTime?>(name = name, type = PropertyType.DATE_TIME)
                     .also { register(property = it) }
 
     /**

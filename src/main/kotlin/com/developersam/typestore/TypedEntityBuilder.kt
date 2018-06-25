@@ -2,19 +2,20 @@ package com.developersam.typestore
 
 import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
+import com.developersam.typestore.PropertyType.DATE_TIME
 import com.developersam.typestore.PropertyType.DOUBLE
 import com.developersam.typestore.PropertyType.KEY
 import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
 import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
-import com.developersam.typestore.PropertyType.TIMESTAMP
 import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.LatLng
 import com.google.cloud.datastore.StringValue
+import java.time.LocalDateTime
 
 /**
  * [TypedEntityBuilder] is responsible for building a [TypedEntity].
@@ -34,12 +35,12 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private co
 
     internal constructor(table: Tbl, newKey: Key) : this(
             table = table, partialBuilder = Entity.newBuilder(newKey),
-            unusedProperties = hashSetOf()
+            unusedProperties = HashSet(table.registeredProperties)
     )
 
     internal constructor(table: Tbl, existingEntity: E) : this(
             table = table, partialBuilder = Entity.newBuilder(existingEntity.entity),
-            unusedProperties = HashSet(table.registeredProperties)
+            unusedProperties = hashSetOf()
     )
 
     /**
@@ -63,7 +64,10 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private co
                 partialBuilder.set(property.name, stringValue)
             }
             BLOB -> partialBuilder.set(property.name, value as Blob)
-            TIMESTAMP -> partialBuilder.set(property.name, value as Timestamp)
+            DATE_TIME -> {
+                val datetime = value as LocalDateTime
+                partialBuilder.set(property.name, datetime.toGcpTimestamp())
+            }
             LAT_LNG -> partialBuilder.set(property.name, value as LatLng)
         }
     }

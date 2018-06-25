@@ -2,27 +2,24 @@ package com.developersam.typestore
 
 import com.developersam.typestore.PropertyType.BLOB
 import com.developersam.typestore.PropertyType.BOOL
+import com.developersam.typestore.PropertyType.DATE_TIME
 import com.developersam.typestore.PropertyType.DOUBLE
 import com.developersam.typestore.PropertyType.KEY
-import com.developersam.typestore.PropertyType.LAT_LNG
 import com.developersam.typestore.PropertyType.LONG
-import com.developersam.typestore.PropertyType.LONG_STRING
 import com.developersam.typestore.PropertyType.STRING
-import com.developersam.typestore.PropertyType.TIMESTAMP
-import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Key
-import com.google.cloud.datastore.StringValue
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter
 import com.google.cloud.datastore.StructuredQuery.Filter
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter
+import java.time.LocalDateTime
 
 /**
  * [TypedFilter] represents a set of filter adapters provided by this system that is type-safe.
  *
  * @param Tbl precise type of the table to apply the filter.
  */
-sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
+sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
 
     /**
      * [asFilter] returns the [Filter] form of this typed filter.
@@ -37,7 +34,7 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
     /**
      * [Eq] represents a filter that requires the [property] to be equal to [value].
      */
-    internal class Eq<Tbl: TypedTable<Tbl>, T>(
+    internal class Eq<Tbl : TypedTable<Tbl>, T>(
             private val property: Property<Tbl, T>, private val value: T
     ) : TypedFilter<Tbl>() {
 
@@ -54,7 +51,8 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     BOOL -> PropertyFilter.eq(property.name, value as Boolean)
                     STRING -> PropertyFilter.eq(property.name, value as String)
                     BLOB -> PropertyFilter.eq(property.name, value as Blob)
-                    TIMESTAMP -> PropertyFilter.eq(property.name, value as Timestamp)
+                    DATE_TIME ->
+                        PropertyFilter.eq(property.name, (value as LocalDateTime).toGcpTimestamp())
                     else -> throw UnsupportedOperationException(
                             "${property.type.name} is unsupported."
                     )
@@ -66,7 +64,7 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
     /**
      * [Lt] represents a filter that requires the [property] to be less than [value].
      */
-    internal class Lt<Tbl: TypedTable<Tbl>, T>(
+    internal class Lt<Tbl : TypedTable<Tbl>, T>(
             private val property: Property<Tbl, T>, private val value: T
     ) : TypedFilter<Tbl>() {
 
@@ -82,7 +80,8 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     BOOL -> PropertyFilter.lt(property.name, value as Boolean)
                     STRING -> PropertyFilter.lt(property.name, value as String)
                     BLOB -> PropertyFilter.lt(property.name, value as Blob)
-                    TIMESTAMP -> PropertyFilter.lt(property.name, value as Timestamp)
+                    DATE_TIME ->
+                        PropertyFilter.lt(property.name, (value as LocalDateTime).toGcpTimestamp())
                     else -> throw UnsupportedOperationException(
                             "${property.type.name} is unsupported."
                     )
@@ -94,7 +93,7 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
     /**
      * [Le] represents a filter that requires the [property] to be less than or equal to [value].
      */
-    internal class Le<Tbl: TypedTable<Tbl>, T>(
+    internal class Le<Tbl : TypedTable<Tbl>, T>(
             private val property: Property<Tbl, T>, private val value: T
     ) : TypedFilter<Tbl>() {
 
@@ -110,7 +109,8 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     BOOL -> PropertyFilter.le(property.name, value as Boolean)
                     STRING -> PropertyFilter.le(property.name, value as String)
                     BLOB -> PropertyFilter.le(property.name, value as Blob)
-                    TIMESTAMP -> PropertyFilter.le(property.name, value as Timestamp)
+                    DATE_TIME ->
+                        PropertyFilter.le(property.name, (value as LocalDateTime).toGcpTimestamp())
                     else -> throw UnsupportedOperationException(
                             "${property.type.name} is unsupported."
                     )
@@ -122,7 +122,7 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
     /**
      * [Gt] represents a filter that requires the [property] to be greater than [value].
      */
-    internal class Gt<Tbl: TypedTable<Tbl>, T>(
+    internal class Gt<Tbl : TypedTable<Tbl>, T>(
             private val property: Property<Tbl, T>, private val value: T
     ) : TypedFilter<Tbl>() {
 
@@ -138,7 +138,8 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     BOOL -> PropertyFilter.gt(property.name, value as Boolean)
                     STRING -> PropertyFilter.gt(property.name, value as String)
                     BLOB -> PropertyFilter.gt(property.name, value as Blob)
-                    TIMESTAMP -> PropertyFilter.gt(property.name, value as Timestamp)
+                    DATE_TIME ->
+                        PropertyFilter.gt(property.name, (value as LocalDateTime).toGcpTimestamp())
                     else -> throw UnsupportedOperationException(
                             "${property.type.name} is unsupported."
                     )
@@ -150,7 +151,7 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
     /**
      * [Ge] represents a filter that requires the [property] to be greater than or equal to [value].
      */
-    internal class Ge<Tbl: TypedTable<Tbl>, T>(
+    internal class Ge<Tbl : TypedTable<Tbl>, T>(
             private val property: Property<Tbl, T>, private val value: T
     ) : TypedFilter<Tbl>() {
 
@@ -166,7 +167,8 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
                     BOOL -> PropertyFilter.ge(property.name, value as Boolean)
                     STRING -> PropertyFilter.ge(property.name, value as String)
                     BLOB -> PropertyFilter.ge(property.name, value as Blob)
-                    TIMESTAMP -> PropertyFilter.ge(property.name, value as Timestamp)
+                    DATE_TIME ->
+                        PropertyFilter.ge(property.name, (value as LocalDateTime).toGcpTimestamp())
                     else -> throw UnsupportedOperationException(
                             "${property.type.name} is unsupported."
                     )
@@ -178,7 +180,7 @@ sealed class TypedFilter<Tbl: TypedTable<Tbl>> {
     /**
      * [And] represents a filter that requires the [f1] and [f2] to be both satisfied.
      */
-    private class And<Tbl: TypedTable<Tbl>>(
+    private class And<Tbl : TypedTable<Tbl>>(
             private val f1: TypedFilter<Tbl>, private val f2: TypedFilter<Tbl>
     ) : TypedFilter<Tbl>() {
 

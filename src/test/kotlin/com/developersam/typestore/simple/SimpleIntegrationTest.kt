@@ -3,6 +3,7 @@ package com.developersam.typestore.simple
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
+import java.time.LocalDateTime
 
 /**
  * [SimpleIntegrationTest] tests how different parts of the typed-wrappers can work together by
@@ -13,11 +14,17 @@ class SimpleIntegrationTest {
     @Test
     fun simpleIntegrationTest() {
         // Create
-        val obj = SimpleEntity.insert { it[SimpleTable.simpleProp] = 1 }
+        val obj = SimpleEntity.insert {
+            it[SimpleTable.simpleProp] = 1
+            it[SimpleTable.simpleDate] = LocalDateTime.now()
+        }
         val key = obj.key
         // Read
         val objFromKey = SimpleEntity.getNotNull(key = key)
-        val objFromQuery = SimpleEntity.query { filter = SimpleTable.simpleProp eq 1 }.first()
+        val earlyDateTime = LocalDateTime.of(2000, 1, 1, 1, 1)
+        val objFromQuery = SimpleEntity.query {
+            filter = (SimpleTable.simpleProp eq 1) and (SimpleTable.simpleDate ge earlyDateTime)
+        }.first()
         assertEquals(objFromKey.simpleProp, objFromQuery.simpleProp)
         // Update
         val newKey = SimpleEntity.update(entity = objFromKey) { it[SimpleTable.simpleProp] = 2 }.key
@@ -28,7 +35,10 @@ class SimpleIntegrationTest {
         assertEquals(3, SimpleEntity.getNotNull(key = newKeyWithUpdate).simpleProp)
         // Batch Create & Update
         SimpleEntity.apply {
-            val es = batchInsert(source = listOf(5L, 6L)) { t, n -> t[SimpleTable.simpleProp] = n }
+            val es = batchInsert(source = listOf(5L, 6L)) { t, n ->
+                t[SimpleTable.simpleProp] = n
+                t[SimpleTable.simpleDate] = LocalDateTime.now()
+            }
             val size = batchUpdate(entities = es) { t, _ -> t[SimpleTable.simpleProp] = 10 }.size
             assertEquals(2, size)
         }

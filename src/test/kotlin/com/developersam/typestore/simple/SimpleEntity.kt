@@ -9,6 +9,7 @@ import com.google.cloud.datastore.Entity
  */
 class SimpleEntity(entity: Entity) : TypedEntity<SimpleTable>(entity = entity) {
     val simpleProp = SimpleTable.simpleProp.delegatedValue
+    val simpleDate = SimpleTable.simpleDate.delegatedValue
 
     companion object : TypedEntityCompanion<SimpleTable, SimpleEntity>(table = SimpleTable) {
         override fun create(entity: Entity): SimpleEntity = SimpleEntity(entity = entity)

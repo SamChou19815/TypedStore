@@ -2,10 +2,12 @@ package com.developersam.typestore
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.NoCredentials
+import com.google.cloud.Timestamp
 import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.DatastoreException
 import com.google.cloud.datastore.DatastoreOptions
 import com.google.cloud.datastore.Transaction
+import java.time.LocalDateTime
 
 /**
  * [DatastoreOptions.Builder.setupLocalDevIfOnLocal] provides an easy-to-use function to
@@ -55,3 +57,14 @@ inline fun <reified T> Datastore.transaction(crossinline f: () -> T): T {
  * datastore.
  */
 inline fun <reified T> transaction(crossinline f: () -> T): T = defaultDatastore.transaction(f)
+
+/**
+ * [Timestamp.toLocalDateTime] returns the [LocalDateTime] version of this time.
+ */
+internal fun Timestamp.toLocalDateTime(): LocalDateTime = toSqlTimestamp().toLocalDateTime()
+
+/**
+ * [LocalDateTime.toGcpTimestamp] returns the GCP [Timestamp] version of this time.
+ */
+internal fun LocalDateTime.toGcpTimestamp(): Timestamp =
+        Timestamp.of(java.sql.Timestamp.valueOf(this))
