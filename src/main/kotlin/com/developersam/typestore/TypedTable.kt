@@ -18,7 +18,8 @@ open class TypedTable<Tbl: TypedTable<Tbl>> protected constructor(tableName: Str
     /**
      * [tableName] returns the name of the table.
      */
-    val tableName: String = tableName ?: javaClass.simpleName
+    val tableName: String = (tableName ?: javaClass.simpleName)
+            .removeSuffix(suffix = "Table").removeSuffix(suffix = "Entity")
 
     /**
      * [registeredProperties] contains a list of all registered properties. This list is designed
