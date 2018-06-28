@@ -45,7 +45,7 @@ fun parseToUTCTime(userTime: String, userTimezoneOffset: Int): LocalDateTime {
 }
 
 /**
- * [toLocalDateTime] returns the [LocalDateTime] in UTC that is equivalent to [date].
+ * [toLocalDateTimeInUTC] returns the [LocalDateTime] in UTC that is equivalent to [date].
  */
 fun toLocalDateTimeInUTC(date: Long): LocalDateTime =
         LocalDateTime.ofInstant(Instant.ofEpochMilli(date), utcZoneId)

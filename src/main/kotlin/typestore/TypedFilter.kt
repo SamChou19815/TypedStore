@@ -1,5 +1,10 @@
 package typestore
 
+import com.google.cloud.datastore.Blob
+import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.StructuredQuery.CompositeFilter
+import com.google.cloud.datastore.StructuredQuery.Filter
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter
 import typestore.PropertyType.BLOB
 import typestore.PropertyType.BOOL
 import typestore.PropertyType.DATE_TIME
@@ -8,11 +13,6 @@ import typestore.PropertyType.ENUM
 import typestore.PropertyType.KEY
 import typestore.PropertyType.LONG
 import typestore.PropertyType.STRING
-import com.google.cloud.datastore.Blob
-import com.google.cloud.datastore.Key
-import com.google.cloud.datastore.StructuredQuery.CompositeFilter
-import com.google.cloud.datastore.StructuredQuery.Filter
-import com.google.cloud.datastore.StructuredQuery.PropertyFilter
 import java.time.LocalDateTime
 
 /**
@@ -23,9 +23,9 @@ import java.time.LocalDateTime
 sealed class TypedFilter<Tbl : TypedTable<Tbl>> {
 
     /**
-     * [asFilter] returns the [Filter] form of this typed filter.
+     * [asFilter] returns the `Filter` form of this typed filter.
      */
-    abstract val asFilter: Filter
+    internal abstract val asFilter: Filter
 
     /**
      * [and] connects this filter and [other] filter.

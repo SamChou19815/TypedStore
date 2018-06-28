@@ -18,7 +18,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
 ) {
 
     /**
-     * [create] creates a [TypedEntity] from an [Entity] from GCP Datastore.
+     * [create] creates a [TypedEntity] from an `Entity` from GCP Datastore.
      */
     protected abstract fun create(entity: Entity): E
 

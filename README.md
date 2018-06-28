@@ -2,6 +2,24 @@
 
 A declarative and type-safe client library for GCP Datastore.
 
+## Gradle Config
+
+[![Release](https://jitpack.io/v/SamChou19815/TypedStore.svg)](https://jitpack.io/#SamChou19815/TypedStore)
+
+Read the docs [here](http://docs.developersam.com/typed-store/)
+
+Add this to your `build.gradle` to use the artifact.
+
+```groovy
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+dependencies {
+    compile 'com.github.SamChou19815:TypedStore:0.1.0'
+}
+```
+
 ## What We Need and Design Goals
 
 GCP Datastore Client Library is great because you don't need to handle the API in raw requests by
