@@ -1,4 +1,4 @@
-package com.developersam.typestore
+package typestore
 
 import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.Entity

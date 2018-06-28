@@ -1,24 +1,24 @@
-package com.developersam.typestore
+package typestore
 
-import com.developersam.typestore.Property.BlobProperty
-import com.developersam.typestore.Property.BoolProperty
-import com.developersam.typestore.Property.DateTimeProperty
-import com.developersam.typestore.Property.DoubleProperty
-import com.developersam.typestore.Property.EnumProperty
-import com.developersam.typestore.Property.KeyProperty
-import com.developersam.typestore.Property.LatLngProperty
-import com.developersam.typestore.Property.LongProperty
-import com.developersam.typestore.Property.LongStringProperty
-import com.developersam.typestore.Property.NullableBlobProperty
-import com.developersam.typestore.Property.NullableBoolProperty
-import com.developersam.typestore.Property.NullableDateTimeProperty
-import com.developersam.typestore.Property.NullableDoubleProperty
-import com.developersam.typestore.Property.NullableKeyProperty
-import com.developersam.typestore.Property.NullableLatLngProperty
-import com.developersam.typestore.Property.NullableLongProperty
-import com.developersam.typestore.Property.NullableLongStringProperty
-import com.developersam.typestore.Property.NullableStringProperty
-import com.developersam.typestore.Property.StringProperty
+import typestore.Property.BlobProperty
+import typestore.Property.BoolProperty
+import typestore.Property.DateTimeProperty
+import typestore.Property.DoubleProperty
+import typestore.Property.EnumProperty
+import typestore.Property.KeyProperty
+import typestore.Property.LatLngProperty
+import typestore.Property.LongProperty
+import typestore.Property.LongStringProperty
+import typestore.Property.NullableBlobProperty
+import typestore.Property.NullableBoolProperty
+import typestore.Property.NullableDateTimeProperty
+import typestore.Property.NullableDoubleProperty
+import typestore.Property.NullableKeyProperty
+import typestore.Property.NullableLatLngProperty
+import typestore.Property.NullableLongProperty
+import typestore.Property.NullableLongStringProperty
+import typestore.Property.NullableStringProperty
+import typestore.Property.StringProperty
 
 /**
  * [TypedTable] represents a set of all entities of the same kind. This class is mostly used for

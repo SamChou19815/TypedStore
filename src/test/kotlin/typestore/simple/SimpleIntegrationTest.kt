@@ -1,10 +1,9 @@
-package com.developersam.typestore.simple
+package typestore.simple
 
-import com.developersam.typestore.nowInUTC
+import typestore.nowInUTC
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
-import java.time.LocalDateTime
 
 /**
  * [SimpleIntegrationTest] tests how different parts of the typed-wrappers can work together by

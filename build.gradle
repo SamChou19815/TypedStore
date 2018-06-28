@@ -37,4 +37,3 @@ test {
         events "passed", "skipped", "failed", "standardOut", "standardError"
     }
 }
-

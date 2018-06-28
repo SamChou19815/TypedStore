@@ -1,6 +1,6 @@
-package com.developersam.typestore.simple
+package typestore.simple
 
-import com.developersam.typestore.TypedTable
+import typestore.TypedTable
 
 /**
  * [SimpleTable] is a very simple table just to test whether the system works.

@@ -1,13 +1,13 @@
-package com.developersam.typestore
+package typestore
 
-import com.developersam.typestore.PropertyType.BLOB
-import com.developersam.typestore.PropertyType.BOOL
-import com.developersam.typestore.PropertyType.DATE_TIME
-import com.developersam.typestore.PropertyType.DOUBLE
-import com.developersam.typestore.PropertyType.ENUM
-import com.developersam.typestore.PropertyType.KEY
-import com.developersam.typestore.PropertyType.LONG
-import com.developersam.typestore.PropertyType.STRING
+import typestore.PropertyType.BLOB
+import typestore.PropertyType.BOOL
+import typestore.PropertyType.DATE_TIME
+import typestore.PropertyType.DOUBLE
+import typestore.PropertyType.ENUM
+import typestore.PropertyType.KEY
+import typestore.PropertyType.LONG
+import typestore.PropertyType.STRING
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter

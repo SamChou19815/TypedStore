@@ -7,7 +7,8 @@ A declarative and type-safe client library for GCP Datastore.
 GCP Datastore Client Library is great because you don't need to handle the API in raw requests by
 yourself. However, it does not provide a type-safe way for you to write maintainable code.
 
-If you take a look at the javadoc of the [Entity class](https://googlecloudplatform.github.io/google-cloud-java/google-cloud-clients/apidocs/com/google/cloud/datastore/BaseEntity.html) 
+If you take a look at the javadoc of the 
+[Entity class](https://googlecloudplatform.github.io/google-cloud-java/google-cloud-clients/apidocs/com/google/cloud/datastore/BaseEntity.html) 
 you will see that it provides a lot of get methods with different types. Although you don't need to
 do the type casts by yourself now, it is still unsafe to use: the types of each property is not
 enforced by the type system.
@@ -23,7 +24,7 @@ object. You specify how to retrieve and update data by DSL-like lambda expressio
 
 ## Getting Started
 
-Declaring a table:
+### Declaring a Table
 
 ```kotlin
 object FooTable : TypedTable<FooTable>() {
@@ -32,9 +33,10 @@ object FooTable : TypedTable<FooTable>() {
 }
 ```
 
-You can see all the supported data types in `TypedTable` class.
+You can see all the supported data types in the 
+[TypedTable](./src/main/kotlin/typestore/TypedTable.kt) class.
 
-Declaring an entity with its companion:
+### Declaring an Entity with Its Companion
 
 ```kotlin
 import com.google.cloud.datastore.Entity // We use GCP Datastore entity
@@ -43,13 +45,15 @@ class FooEntity(entity: Entity) : TypedEntity<FooTable>(entity = entity) {
   val bar: String = FooTable.bar.delegatedValue
   val answer42: Long get() = FooTable.answer42.delegatedValue
   
-  companion object : TypedEntityCompanion<FooEntity>(table = FooTable) {
+  companion object : TypedEntityCompanion<FooTable, FooEntity>(table = FooTable) {
     override fun create(entity: Entity): FooEntity = FooEntity(entity = entity)
   }
 }
 ```
 
-Sample CRUD:
+Although the generics declaration is a little ugly, it's needed for type-safe CRUD.
+
+### Sample CRUD
 
 ```kotlin
 // Create
@@ -57,10 +61,13 @@ val obj = FooEntity.insert {
     // You need to explicitly declare all the fields. Otherwise, it will throw an exception.
     it[FooTable.bar] = "haha"
     it[FooTable.answer42] = 42
+    // The type system ensures it[BarTable.bar] = 42 is a compile time error.
 }
 // Read
 val entities = FooEntity.query { 
+  // filter, order, and limit are all optional
   filter = FooTable.answer42 eq 42
+  order = FooTable.answer42.desc()
   limit = 3
 }.toList()
 // Update
@@ -69,7 +76,13 @@ val updated = FooEntity.update(entity = obj) { it[FooTable.bar] = "Oh, no!" }
 fun d() = FooEntity.delete(updated.key)
 ```
 
-Transaction: 
+Notes: 
+- You can see a list of all supported DB operations in the 
+[TypedEntityCompanion](./src/main/kotlin/typestore/TypedEntityCompanion.kt) class.
+- You can see a list of all supported filters in the 
+[TypedFilter](./src/main/kotlin/typestore/TypedFilter.kt) class.
+
+### Transaction
 
 Assuming your datastore object is `datastore`, you can write an inline function `transaction` in
 this way and simply use it. The code for transaction is put inside the inlined lambda expression.
@@ -77,6 +90,11 @@ this way and simply use it. The code for transaction is put inside the inlined l
 ```kotlin
 inline fun <reified T> transaction(crossinline f: () -> T): T = datastore.transaction(f)
 ```
+
+### More Examples
+
+The test also shows some example usage. You can read those tests or add some of yours and make a 
+pull request.
 
 ## Notes
 

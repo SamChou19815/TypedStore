@@ -1,4 +1,4 @@
-package com.developersam.typestore
+package typestore
 
 import com.google.cloud.datastore.EntityQuery
 import com.google.cloud.datastore.Query

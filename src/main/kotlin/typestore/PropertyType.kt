@@ -1,4 +1,4 @@
-package com.developersam.typestore
+package typestore
 
 /**
  * [PropertyType] represents a set of supported types in GCP Datastore in their not-nullable form.

@@ -1,4 +1,4 @@
-package com.developersam.typestore
+package typestore
 
 import com.google.cloud.Timestamp
 import java.time.Instant
