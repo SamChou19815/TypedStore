@@ -9,7 +9,7 @@ import com.google.cloud.datastore.StructuredQuery.OrderBy
  *
  * @param table the table to query.
  */
-class TypedQueryBuilder<Tbl: TypedTable<Tbl>> internal constructor(table: Tbl) {
+class TypedQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(val table: Tbl) {
 
     /**
      * [backingBuilder] is the backing field for this type-safe builder.
@@ -18,32 +18,47 @@ class TypedQueryBuilder<Tbl: TypedTable<Tbl>> internal constructor(table: Tbl) {
             Query.newEntityQueryBuilder().setKind(table.tableName)
 
     /**
-     * [filter] sets the filter.
+     * Internally used typed filter for DSL.
      */
-    var filter: TypedFilter<Tbl>
-        get() = throw UnsupportedOperationException()
-        set(value) {
-            backingBuilder.setFilter(value.asFilter)
-        }
+    private val typedFilterBuilder: TypedFilterBuilder<Tbl> = TypedFilterBuilder(table = table)
 
     /**
-     * [order] sets the order.
+     * [filter] starts a filter DSL.
+     *
+     * All filters declared in filter will be merged by and.
      */
-    var order: OrderBy
-        get() = throw UnsupportedOperationException()
-        set(value) {
-            backingBuilder.setOrderBy(value)
-        }
+    fun filter(config: TypedFilterBuilder<Tbl>.() -> Unit): Unit = typedFilterBuilder.config()
 
     /**
-     * [limit] sets the limit.
+     * [asc] sets the order on this property in ascending order.
+     * It will reset previously set order, if any.
      */
-    var limit: Int
-        get() = throw UnsupportedOperationException()
-        set(value) {
-            backingBuilder.setLimit(value)
-        }
+    fun Property<Tbl, *>.asc() {
+        backingBuilder.setOrderBy(OrderBy.asc(name))
+    }
 
-    internal fun build(): EntityQuery = backingBuilder.build()
+    /**
+     * [desc] sets the order on this property in descending order.
+     * It will reset previously set order, if any.
+     */
+    fun Property<Tbl, *>.desc() {
+        backingBuilder.setOrderBy(OrderBy.desc(name))
+    }
+
+    /**
+     * [withLimit] sets the limit.
+     * It will reset previously set limit, if any.
+     */
+    fun withLimit(limit: Int) {
+        backingBuilder.setLimit(limit)
+    }
+
+    /**
+     * [build] will build the [EntityQuery] for the query.
+     */
+    internal fun build(): EntityQuery {
+        typedFilterBuilder.backingFilter?.let { backingBuilder.setFilter(it) }
+        return backingBuilder.build()
+    }
 
 }

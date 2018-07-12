@@ -24,22 +24,28 @@ class TypedAncestorQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(
             Query.newEntityQueryBuilder().setKind(table.tableName).setFilter(hasAncestor(ancestor))
 
     /**
-     * [order] sets the order.
+     * [asc] sets the order on this property in ascending order.
+     * It will reset previously set order, if any.
      */
-    var order: OrderBy
-        get() = throw UnsupportedOperationException()
-        set(value) {
-            backingBuilder.setOrderBy(value)
-        }
+    fun Property<Tbl, *>.asc() {
+        backingBuilder.setOrderBy(OrderBy.asc(name))
+    }
 
     /**
-     * [limit] sets the limit.
+     * [desc] sets the order on this property in descending order.
+     * It will reset previously set order, if any.
      */
-    var limit: Int
-        get() = throw UnsupportedOperationException()
-        set(value) {
-            backingBuilder.setLimit(value)
-        }
+    fun Property<Tbl, *>.desc() {
+        backingBuilder.setOrderBy(OrderBy.desc(name))
+    }
+
+    /**
+     * [withLimit] sets the limit.
+     * It will reset previously set limit, if any.
+     */
+    fun withLimit(limit: Int) {
+        backingBuilder.setLimit(limit)
+    }
 
     internal fun build(): EntityQuery = backingBuilder.build()
 

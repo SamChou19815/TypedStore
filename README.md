@@ -16,7 +16,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-    compile 'com.github.SamChou19815:TypedStore:0.1.0'
+    compile 'com.github.SamChou19815:TypedStore:0.2.0'
 }
 ```
 
@@ -77,19 +77,22 @@ Although the generics declaration is a little ugly, it's needed for type-safe CR
 // Create
 val obj = FooEntity.insert { 
     // You need to explicitly declare all the fields. Otherwise, it will throw an exception.
-    it[FooTable.bar] = "haha"
-    it[FooTable.answer42] = 42
+    table.bar gets "haha"
+    // The second way of setting things
+    this[FooTable.answer42] = 42
     // The type system ensures it[BarTable.bar] = 42 is a compile time error.
 }
 // Read
 val entities = FooEntity.query { 
   // filter, order, and limit are all optional
-  filter = FooTable.answer42 eq 42
-  order = FooTable.answer42.desc()
-  limit = 3
+  filter {
+    table.answer42 eq 42
+  }
+  FooTable.answer42.desc()
+  withLimit(limit = 3)
 }.toList()
 // Update
-val updated = FooEntity.update(entity = obj) { it[FooTable.bar] = "Oh, no!" }
+val updated = FooEntity.update(entity = obj) { FooTable.bar gets "Oh, no!" }
 // Delete
 fun d() = FooEntity.delete(updated.key)
 ```

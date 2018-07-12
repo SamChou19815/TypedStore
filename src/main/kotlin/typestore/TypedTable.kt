@@ -1,24 +1,19 @@
 package typestore
 
-import typestore.Property.BlobProperty
-import typestore.Property.BoolProperty
-import typestore.Property.DateTimeProperty
-import typestore.Property.DoubleProperty
+import com.google.cloud.datastore.Blob
+import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.LatLng
 import typestore.Property.EnumProperty
-import typestore.Property.KeyProperty
-import typestore.Property.LatLngProperty
-import typestore.Property.LongProperty
-import typestore.Property.LongStringProperty
-import typestore.Property.NullableBlobProperty
-import typestore.Property.NullableBoolProperty
-import typestore.Property.NullableDateTimeProperty
-import typestore.Property.NullableDoubleProperty
-import typestore.Property.NullableKeyProperty
-import typestore.Property.NullableLatLngProperty
-import typestore.Property.NullableLongProperty
-import typestore.Property.NullableLongStringProperty
-import typestore.Property.NullableStringProperty
-import typestore.Property.StringProperty
+import typestore.PropertyType.BLOB
+import typestore.PropertyType.BOOL
+import typestore.PropertyType.DATE_TIME
+import typestore.PropertyType.DOUBLE
+import typestore.PropertyType.KEY
+import typestore.PropertyType.LAT_LNG
+import typestore.PropertyType.LONG
+import typestore.PropertyType.LONG_STRING
+import typestore.PropertyType.STRING
+import java.time.LocalDateTime
 
 /**
  * [TypedTable] represents a set of all entities of the same kind. This class is mostly used for
@@ -58,40 +53,40 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun keyProperty(name: String): KeyProperty<Tbl> =
-            KeyProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun keyProperty(name: String): Property<Tbl, Key> =
+            Property<Tbl, Key>(name = name, type = KEY).also { register(property = it) }
 
     /**
      * [nullableKeyProperty] declares, registers, and returns a nullable key property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableKeyProperty(name: String): NullableKeyProperty<Tbl> =
-            NullableKeyProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableKeyProperty(name: String): Property<Tbl, Key?> =
+            Property<Tbl, Key?>(name = name, type = KEY).also { register(property = it) }
 
     /**
      * [longProperty] declares, registers, and returns a not-null long property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun longProperty(name: String): LongProperty<Tbl> =
-            LongProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun longProperty(name: String): Property<Tbl, Long> =
+            Property<Tbl, Long>(name = name, type = LONG).also { register(property = it) }
 
     /**
      * [nullableLongProperty] declares, registers, and returns a nullable long property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableLongProperty(name: String): NullableLongProperty<Tbl> =
-            NullableLongProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableLongProperty(name: String): Property<Tbl, Long?> =
+            Property<Tbl, Long?>(name = name, type = LONG).also { register(property = it) }
 
     /**
      * [doubleProperty] declares, registers, and returns a not-null double property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun doubleProperty(name: String): DoubleProperty<Tbl> =
-            DoubleProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun doubleProperty(name: String): Property<Tbl, Double> =
+            Property<Tbl, Double>(name = name, type = DOUBLE).also { register(property = it) }
 
     /**
      * [nullableDoubleProperty] declares, registers, and returns a nullable double property with
@@ -99,16 +94,16 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableDoubleProperty(name: String): NullableDoubleProperty<Tbl> =
-            NullableDoubleProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableDoubleProperty(name: String): Property<Tbl, Double?> =
+            Property<Tbl, Double?>(name = name, type = DOUBLE).also { register(property = it) }
 
     /**
      * [boolProperty] declares, registers, and returns a not-null boolean property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun boolProperty(name: String): BoolProperty<Tbl> =
-            BoolProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun boolProperty(name: String): Property<Tbl, Boolean> =
+            Property<Tbl, Boolean>(name = name, type = BOOL).also { register(property = it) }
 
     /**
      * [nullableBoolProperty] declares, registers, and returns a nullable boolean property with
@@ -116,16 +111,16 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableBoolProperty(name: String): NullableBoolProperty<Tbl> =
-            NullableBoolProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableBoolProperty(name: String): Property<Tbl, Boolean?> =
+            Property<Tbl, Boolean?>(name = name, type = BOOL).also { register(property = it) }
 
     /**
      * [stringProperty] declares, registers, and returns a not-null string property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun stringProperty(name: String): StringProperty<Tbl> =
-            StringProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun stringProperty(name: String): Property<Tbl, String> =
+            Property<Tbl, String>(name = name, type = STRING).also { register(property = it) }
 
     /**
      * [nullableStringProperty] declares, registers, and returns a nullable string property with
@@ -133,8 +128,8 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableStringProperty(name: String): NullableStringProperty<Tbl> =
-            NullableStringProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableStringProperty(name: String): Property<Tbl, String?> =
+            Property<Tbl, String?>(name = name, type = STRING).also { register(property = it) }
 
     /**
      * [longStringProperty] declares, registers, and returns a not-null long string property with
@@ -142,8 +137,8 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun longStringProperty(name: String): LongStringProperty<Tbl> =
-            LongStringProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun longStringProperty(name: String): Property<Tbl, String> =
+            Property<Tbl, String>(name = name, type = LONG_STRING).also { register(property = it) }
 
     /**
      * [nullableLongStringProperty] declares, registers, and returns a nullable long string property
@@ -151,8 +146,8 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableLongStringProperty(name: String): NullableLongStringProperty<Tbl> =
-            NullableLongStringProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableLongStringProperty(name: String): Property<Tbl, String?> =
+            Property<Tbl, String?>(name = name, type = LONG_STRING).also { register(property = it) }
 
     /**
      * [enumProperty] declares, registers, and returns a not-null enum property with [name] and
@@ -169,41 +164,32 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun datetimeProperty(name: String): DateTimeProperty<Tbl> =
-            DateTimeProperty<Tbl>(name = name).also { register(property = it) }
-
-    /**
-     * [nullableDatetimeProperty] declares, registers, and returns a nullable date-time property
-     * with [name].
-     *
-     * @throws IllegalArgumentException if the property with this name is already registered.
-     */
-    protected fun nullableDatetimeProperty(name: String): NullableDateTimeProperty<Tbl> =
-            NullableDateTimeProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun datetimeProperty(name: String): Property<Tbl, LocalDateTime> =
+            Property<Tbl, LocalDateTime>(name = name, type = DATE_TIME).also { register(it) }
 
     /**
      * [blobProperty] declares, registers, and returns a not-null blob property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun blobProperty(name: String): BlobProperty<Tbl> =
-            BlobProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun blobProperty(name: String): Property<Tbl, Blob> =
+            Property<Tbl, Blob>(name = name, type = BLOB).also { register(property = it) }
 
     /**
      * [nullableBlobProperty] declares, registers, and returns a nullable blob property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableBlobProperty(name: String): NullableBlobProperty<Tbl> =
-            NullableBlobProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableBlobProperty(name: String): Property<Tbl, Blob?> =
+            Property<Tbl, Blob?>(name = name, type = BLOB).also { register(property = it) }
 
     /**
      * [latLngProperty] declares, registers, and returns a not-null lat-lng property with [name].
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun latLngProperty(name: String): LatLngProperty<Tbl> =
-            LatLngProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun latLngProperty(name: String): Property<Tbl, LatLng> =
+            Property<Tbl, LatLng>(name = name, type = LAT_LNG).also { register(property = it) }
 
     /**
      * [nullableLatLngProperty] declares, registers, and returns a nullable lat-lng property with
@@ -211,7 +197,7 @@ open class TypedTable<Tbl : TypedTable<Tbl>> protected constructor(tableName: St
      *
      * @throws IllegalArgumentException if the property with this name is already registered.
      */
-    protected fun nullableLatLngProperty(name: String): NullableLatLngProperty<Tbl> =
-            NullableLatLngProperty<Tbl>(name = name).also { register(property = it) }
+    protected fun nullableLatLngProperty(name: String): Property<Tbl, LatLng?> =
+            Property<Tbl, LatLng?>(name = name, type = LAT_LNG).also { register(property = it) }
 
 }

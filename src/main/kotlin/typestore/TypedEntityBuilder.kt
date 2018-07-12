@@ -1,5 +1,10 @@
 package typestore
 
+import com.google.cloud.datastore.Blob
+import com.google.cloud.datastore.Entity
+import com.google.cloud.datastore.Key
+import com.google.cloud.datastore.LatLng
+import com.google.cloud.datastore.StringValue
 import typestore.PropertyType.BLOB
 import typestore.PropertyType.BOOL
 import typestore.PropertyType.DATE_TIME
@@ -10,11 +15,6 @@ import typestore.PropertyType.LAT_LNG
 import typestore.PropertyType.LONG
 import typestore.PropertyType.LONG_STRING
 import typestore.PropertyType.STRING
-import com.google.cloud.datastore.Blob
-import com.google.cloud.datastore.Entity
-import com.google.cloud.datastore.Key
-import com.google.cloud.datastore.LatLng
-import com.google.cloud.datastore.StringValue
 import java.time.LocalDateTime
 
 /**
@@ -29,7 +29,7 @@ import java.time.LocalDateTime
  * @param E precise type of the [TypedEntity].
  */
 class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private constructor(
-        private val table: Tbl, private val partialBuilder: Entity.Builder,
+        val table: Tbl, private val partialBuilder: Entity.Builder,
         private val unusedProperties: HashSet<Property<Tbl, *>>
 ) {
 
@@ -44,34 +44,39 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private co
     )
 
     /**
-     * [set] sets the value of the [property] to be [value].
+     * [gets] sets the value of this property to be [value].
      */
-    operator fun <T> set(property: Property<Tbl, T>, value: T) {
-        unusedProperties.remove(element = property)
+    infix fun <T> Property<Tbl, T>.gets(value: T) {
+        unusedProperties.remove(element = this)
         if (value == null) {
-            partialBuilder.setNull(property.name)
+            partialBuilder.setNull(name)
             return
         }
-        when (property.type) {
-            KEY -> partialBuilder.set(property.name, value as Key)
-            LONG -> partialBuilder.set(property.name, value as Long)
-            DOUBLE -> partialBuilder.set(property.name, value as Double)
-            BOOL -> partialBuilder.set(property.name, value as Boolean)
-            STRING -> partialBuilder.set(property.name, value as String)
+        when (type) {
+            KEY -> partialBuilder.set(name, value as Key)
+            LONG -> partialBuilder.set(name, value as Long)
+            DOUBLE -> partialBuilder.set(name, value as Double)
+            BOOL -> partialBuilder.set(name, value as Boolean)
+            STRING -> partialBuilder.set(name, value as String)
             LONG_STRING -> {
                 val stringValue = StringValue.newBuilder(value as String)
                         .setExcludeFromIndexes(true).build()
-                partialBuilder.set(property.name, stringValue)
+                partialBuilder.set(name, stringValue)
             }
-            ENUM -> partialBuilder.set(property.name, (value as Enum<*>).name)
-            BLOB -> partialBuilder.set(property.name, value as Blob)
+            ENUM -> partialBuilder.set(name, (value as Enum<*>).name)
+            BLOB -> partialBuilder.set(name, value as Blob)
             DATE_TIME -> {
                 val datetime = value as LocalDateTime
-                partialBuilder.set(property.name, datetime.toGcpTimestamp())
+                partialBuilder.set(name, datetime.toGcpTimestamp())
             }
-            LAT_LNG -> partialBuilder.set(property.name, value as LatLng)
+            LAT_LNG -> partialBuilder.set(name, value as LatLng)
         }
     }
+
+    /**
+     * [set] sets the value of the [property] to be [value].
+     */
+    operator fun <T> set(property: Property<Tbl, T>, value: T): Unit = property gets value
 
     /**
      * [buildEntity] builds the builder into a raw Datastore [Entity].

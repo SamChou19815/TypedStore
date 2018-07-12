@@ -4,6 +4,7 @@ import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.PathElement
+import com.google.cloud.datastore.Query
 
 /**
  * [TypedEntityCompanion] is designed to be the companion object of a [TypedEntity], so that typed
@@ -42,7 +43,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * [any] tests and returns whether there exists any entity as specified by the query in
      * [builder].
      */
-    fun any(builder: TypedQueryBuilder<Tbl>.() -> Unit): Boolean =
+    fun any(builder: TypedQueryBuilder<Tbl>.() -> Unit = {}): Boolean =
             TypedQueryBuilder(table = table).apply(builder)
                     .build()
                     .let { datastore.run(it) }
@@ -54,15 +55,12 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     fun all(): Sequence<E> = query(builder = {})
 
     /**
-     * [query] uses the given [ancestor] key and the given query [builder] to construct a query and
-     * returns the result in sequence.
+     * [allKeys] simply returns all keys without any restrictions.
      */
-    fun query(ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}): Sequence<E> =
-            TypedAncestorQueryBuilder(table = table, ancestor = ancestor).apply(builder)
-                    .build()
+    fun allKeys(): Sequence<Key> =
+            Query.newKeyQueryBuilder().setKind(table.tableName).build()
                     .let { datastore.run(it) }
                     .asSequence()
-                    .map(transform = ::create)
 
     /**
      * [query] uses the given query builder [builder] to construct a query and returns the result
@@ -70,6 +68,17 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      */
     fun query(builder: TypedQueryBuilder<Tbl>.() -> Unit): Sequence<E> =
             TypedQueryBuilder(table = table).apply(builder)
+                    .build()
+                    .let { datastore.run(it) }
+                    .asSequence()
+                    .map(transform = ::create)
+
+    /**
+     * [query] uses the given [ancestor] key and the given query [builder] to construct a query and
+     * returns the result in sequence.
+     */
+    fun query(ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}): Sequence<E> =
+            TypedAncestorQueryBuilder(table = table, ancestor = ancestor).apply(builder)
                     .build()
                     .let { datastore.run(it) }
                     .asSequence()
@@ -91,7 +100,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * [insert] inserts a new entity created by [builder] with an optional [parent] into datastore.
      * It returns the newly created entity.
      */
-    fun insert(parent: Key? = null, builder: (TypedEntityBuilder<Tbl, E>) -> Unit): E {
+    fun insert(parent: Key? = null, builder: TypedEntityBuilder<Tbl, E>.() -> Unit): E {
         val newKey = createNewKey(parent = parent)
         val newEntity = TypedEntityBuilder<Tbl, E>(table = table, newKey = newKey)
                 .apply(block = builder)
@@ -106,11 +115,11 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      */
     fun <T : Any> batchInsert(
             parent: Key? = null, source: Iterable<T>,
-            builder: (TypedEntityBuilder<Tbl, E>, T) -> Unit
+            builder: TypedEntityBuilder<Tbl, E>.(T) -> Unit
     ): List<E> {
         val newEntities = source.map { s ->
             TypedEntityBuilder<Tbl, E>(table = table, newKey = createNewKey(parent = parent))
-                    .apply { builder(this, s) }
+                    .apply { builder(s) }
                     .buildEntity()
         }
         return datastore.add(*newEntities.toTypedArray()).map { create(entity = it) }
@@ -120,21 +129,24 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * [update] updates the [entity] with the given [builder], puts the updated one into the
      * database and returns the updated entity.
      */
-    fun update(entity: E, builder: (TypedEntityBuilder<Tbl, E>) -> Unit): E {
+    fun update(entity: E, builder: TypedEntityBuilder<Tbl, E>.() -> Unit): E {
         val updatedEntity = TypedEntityBuilder(table = table, existingEntity = entity)
                 .apply(block = builder)
                 .buildEntity()
-        return datastore.put(updatedEntity).let { create(entity = it) }
+        // Optimize if nothing is updated.
+        return if (entity.entity == updatedEntity) entity else {
+            create(entity = datastore.put(updatedEntity))
+        }
     }
 
     /**
      * [batchUpdate] updates a list of [entities] with the specified [builder] and returns a list
      * of the updated entities.
      */
-    fun batchUpdate(entities: List<E>, builder: (TypedEntityBuilder<Tbl, E>, E) -> Unit): List<E> {
+    fun batchUpdate(entities: List<E>, builder: TypedEntityBuilder<Tbl, E>.(E) -> Unit): List<E> {
         val updatedEntities = entities.map { e ->
             TypedEntityBuilder(table = table, existingEntity = e)
-                    .apply { builder(this, e) }
+                    .apply { builder(e) }
                     .buildEntity()
         }
         return datastore.put(*updatedEntities.toTypedArray()).map { create(entity = it) }
@@ -145,7 +157,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * or inserts according to the [builder] if it's not given.
      * In either case, the key of the new entity is returned.
      */
-    fun upsert(entity: E?, builder: (TypedEntityBuilder<Tbl, E>) -> Unit): E =
+    fun upsert(entity: E?, builder: TypedEntityBuilder<Tbl, E>.() -> Unit): E =
             entity?.let { update(entity = it, builder = builder) } ?: insert(builder = builder)
 
     /**
@@ -158,5 +170,10 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * [delete] deletes the entities with given [keys] from the datastore.
      */
     fun delete(vararg keys: Key): Unit = datastore.delete(*keys)
+
+    /**
+     * [deleteAll] deletes all entities in this table.
+     */
+    fun deleteAll(): Unit = delete(*allKeys().toList().toTypedArray())
 
 }
