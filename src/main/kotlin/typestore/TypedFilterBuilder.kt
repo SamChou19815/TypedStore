@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 /**
  * [TypedFilterBuilder] is used for filter DSL.
  */
-class TypedFilterBuilder<Tbl : TypedTable<Tbl>> internal constructor(val table: Tbl) {
+class TypedFilterBuilder<Tbl : TypedTable<Tbl>> internal constructor() {
 
     /**
      * [backingFilter] is the backing field for the filter builder.

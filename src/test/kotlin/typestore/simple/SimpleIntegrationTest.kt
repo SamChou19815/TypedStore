@@ -1,6 +1,6 @@
 package typestore.simple
 
-import com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table
+import com.google.cloud.datastore.Key
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
@@ -12,15 +12,19 @@ import typestore.nowInUTC
  */
 class SimpleIntegrationTest {
 
-    @Test
-    fun simpleIntegrationTest() {
-        // Create
-        val key = SimpleEntity.insert {
-            table.simpleProp gets 1
-            table.simpleDate gets nowInUTC()
-            table.simpleEnum gets SimpleEnum.A
-        }.key
-        // Read
+    /**
+     * Create the first object and returns the key.
+     */
+    private fun create(): Key = SimpleEntity.insert {
+        table.simpleProp gets 1
+        table.simpleDate gets nowInUTC()
+        table.simpleEnum gets SimpleEnum.A
+    }.key
+
+    /**
+     * Read from the given [key], query and compare.
+     */
+    private fun read(key: Key): SimpleEntity {
         val objFromKey = SimpleEntity.getNotNull(key = key)
         val objFromQuery = SimpleEntity.query {
             filter {
@@ -28,18 +32,30 @@ class SimpleIntegrationTest {
                 table.simpleDate.isPast()
                 table.simpleEnum eq SimpleEnum.A
             }
+            table.simpleProp.desc()
+            table.simpleDate.asc()
+            withLimit(limit = 100)
         }.first()
         assertEquals(objFromKey.simpleProp, objFromQuery.simpleProp)
-        // Update
-        kotlin.run {
-            val newKey = SimpleEntity.update(entity = objFromKey) { table.simpleProp gets 2 }.key
-            val newObj = SimpleEntity.getNotNull(key = newKey)
-            assertEquals(2, newObj.simpleProp)
-            assertEquals(newKey, key)
-            val newKeyWithUpdate = SimpleEntity.upsert(newObj) { table.simpleProp gets 3 }.key
-            assertEquals(3, SimpleEntity.getNotNull(key = newKeyWithUpdate).simpleProp)
-        }
-        // Batch Create & Update
+        return objFromKey
+    }
+
+    /**
+     * Update from the given object [obj].
+     */
+    private fun update(obj: SimpleEntity) {
+        val newKey = SimpleEntity.update(entity = obj) { table.simpleProp gets 2 }.key
+        val newObj = SimpleEntity.getNotNull(key = newKey)
+        assertEquals(2, newObj.simpleProp)
+        assertEquals(newKey, obj.key)
+        val newKeyWithUpdate = SimpleEntity.upsert(newObj) { table.simpleProp gets 3 }.key
+        assertEquals(3, SimpleEntity.getNotNull(key = newKeyWithUpdate).simpleProp)
+    }
+
+    /**
+     * Run some batch operations
+     */
+    private fun batchOperations() {
         SimpleEntity.apply {
             val entities = batchInsert(source = listOf(5L, 6L)) { n ->
                 table.simpleProp gets n
@@ -49,14 +65,27 @@ class SimpleIntegrationTest {
             val size = batchUpdate(entities = entities) { table.simpleProp gets 10 }.size
             assertEquals(2, size)
         }
-        // Delete All
-        kotlin.run {
-            val keysToBeDeleted = SimpleEntity.all().map { it.key }.toList().toTypedArray()
-            SimpleEntity.delete(*keysToBeDeleted)
-            for (deletedKey in keysToBeDeleted) {
-                assertTrue(deletedKey !in SimpleEntity)
-            }
+    }
+
+    /**
+     * Delete all data to clean up.
+     */
+    private fun deleteAll() {
+        val keysToBeDeleted = SimpleEntity.all().map { it.key }.toList().toTypedArray()
+        SimpleEntity.delete(*keysToBeDeleted)
+        SimpleEntity.deleteAll()
+        for (deletedKey in keysToBeDeleted) {
+            assertTrue(deletedKey !in SimpleEntity)
         }
+    }
+
+    @Test
+    fun simpleIntegrationTest() {
+        val key = create() // C
+        val obj = read(key = key) // R
+        update(obj = obj) // U
+        batchOperations() // C & U
+        deleteAll() // D
     }
 
 }

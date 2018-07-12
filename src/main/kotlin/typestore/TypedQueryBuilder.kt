@@ -20,7 +20,7 @@ class TypedQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(val table: T
     /**
      * Internally used typed filter for DSL.
      */
-    private val typedFilterBuilder: TypedFilterBuilder<Tbl> = TypedFilterBuilder(table = table)
+    private val typedFilterBuilder: TypedFilterBuilder<Tbl> = TypedFilterBuilder()
 
     /**
      * [filter] starts a filter DSL.
