@@ -14,14 +14,23 @@ open class Property<Tbl : TypedTable<Tbl>, T> internal constructor(
         internal val name: String, internal val type: PropertyType
 ) {
 
+    /**
+     * Returns JSON-like string representation.
+     */
     override fun toString(): String = "Property{ name: \"$name\", type: ${type.name} }"
 
+    /**
+     * Checks equality with [other] only based on name.
+     */
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other is Property<*, *> -> name == other.name
         else -> false
     }
 
+    /**
+     * Returns the hashcode that is only based on name.
+     */
     override fun hashCode(): Int = name.hashCode()
 
     /**

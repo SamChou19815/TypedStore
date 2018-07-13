@@ -71,8 +71,8 @@ class SimpleIntegrationTest {
      * Delete all data to clean up.
      */
     private fun deleteAll() {
-        val keysToBeDeleted = SimpleEntity.all().map { it.key }.toList().toTypedArray()
-        SimpleEntity.delete(*keysToBeDeleted)
+        val keysToBeDeleted = SimpleEntity.all().map { it.key }.toList()
+        SimpleEntity.delete(keys = keysToBeDeleted)
         SimpleEntity.deleteAll()
         for (deletedKey in keysToBeDeleted) {
             assertTrue(deletedKey !in SimpleEntity)

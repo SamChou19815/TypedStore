@@ -1,5 +1,6 @@
 package typedstore
 
+import com.google.cloud.datastore.Cursor
 import com.google.cloud.datastore.EntityQuery
 import com.google.cloud.datastore.Query
 import com.google.cloud.datastore.StructuredQuery.OrderBy
@@ -51,6 +52,22 @@ class TypedQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(val table: T
      */
     fun withLimit(limit: Int) {
         backingBuilder.setLimit(limit)
+    }
+
+    /**
+     * [startAt] sets the start cursor to be [cursor].
+     * It will reset previously set cursor, if any.
+     */
+    fun startAt(cursor: Cursor) {
+        backingBuilder.setStartCursor(cursor)
+    }
+
+    /**
+     * [endAt] sets the end cursor to be [cursor].
+     * It will reset previously set cursor, if any.
+     */
+    fun endAt(cursor: Cursor) {
+        backingBuilder.setEndCursor(cursor)
     }
 
     /**

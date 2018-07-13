@@ -1,11 +1,12 @@
 package typedstore
 
+import com.google.cloud.datastore.Cursor
 import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.PathElement
 import com.google.cloud.datastore.Query
-import kotlin.math.acos
+import com.google.cloud.datastore.QueryResults
 
 /**
  * [TypedEntityCompanion] is designed to be the companion object of a [TypedEntity], so that typed
@@ -82,26 +83,61 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     fun allDescenders(ancestor: Key): Sequence<E> = query(ancestor = ancestor)
 
     /**
+     * [queryRaw] uses the given query builder [builder] to construct a query and returns the raw
+     * query result.
+     */
+    private fun queryRaw(builder: TypedQueryBuilder<Tbl>.() -> Unit): QueryResults<Entity> =
+            datastore.run(TypedQueryBuilder(table = table).apply(block = builder).build())
+
+    /**
      * [query] uses the given query builder [builder] to construct a query and returns the result
      * in sequence.
      */
     fun query(builder: TypedQueryBuilder<Tbl>.() -> Unit): Sequence<E> =
-            TypedQueryBuilder(table = table).apply(builder)
+            queryRaw(builder = builder).asSequence().map(transform = ::create)
+
+    /**
+     * [queryCursored] uses the given query builder [builder] to construct a query and returns the
+     * result in sequence along with a cursor after.
+     */
+    fun queryCursored(builder: TypedQueryBuilder<Tbl>.() -> Unit): Pair<Sequence<E>, Cursor> {
+        val result = queryRaw(builder = builder)
+        return result.asSequence().map(transform = ::create) to result.cursorAfter
+    }
+
+    /**
+     * [queryRaw] uses the given query builder [builder] to construct a query and returns the raw
+     * query result.
+     */
+    /**
+     * [queryRaw] uses the given [ancestor] key and the given query [builder] to construct a query
+     * and returns the raw query result.
+     */
+    private fun queryRaw(
+            ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit
+    ): QueryResults<Entity> =
+            TypedAncestorQueryBuilder(table = table, ancestor = ancestor)
+                    .apply(block = builder)
                     .build()
                     .let { datastore.run(it) }
-                    .asSequence()
-                    .map(transform = ::create)
 
     /**
      * [query] uses the given [ancestor] key and the given query [builder] to construct a query and
      * returns the result in sequence.
      */
     fun query(ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}): Sequence<E> =
-            TypedAncestorQueryBuilder(table = table, ancestor = ancestor).apply(builder)
-                    .build()
-                    .let { datastore.run(it) }
-                    .asSequence()
-                    .map(transform = ::create)
+            queryRaw(ancestor = ancestor, builder = builder).asSequence().map(transform = ::create)
+
+    /**
+     * [queryCursored] uses the given [ancestor] key and the given query builder [builder] to
+     * construct a query and returns the result in sequence along with a cursor after.
+     */
+    fun queryCursored(
+            ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}
+    ): Pair<Sequence<E>, Cursor> {
+        val result = queryRaw(ancestor = ancestor, builder = builder)
+        return result.asSequence().map(transform = ::create) to result.cursorAfter
+    }
 
     /**
      * [createNewKey] creates and returns a new key for an new entity, with a nullable [parent] as
