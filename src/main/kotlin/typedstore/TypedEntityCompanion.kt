@@ -5,6 +5,7 @@ import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.PathElement
 import com.google.cloud.datastore.Query
+import kotlin.math.acos
 
 /**
  * [TypedEntityCompanion] is designed to be the companion object of a [TypedEntity], so that typed
@@ -25,11 +26,23 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
 
     /**
      * [get] returns the entity with the given [key] or `null` if it does not exist.
+     * The caller of the method needs to ensure that the key actually corresponds to this table,
+     * otherwise the behavior is unspecified.
      */
-    operator fun get(key: Key): E? = datastore[key]?.let { create(entity = it) }
+    operator fun get(key: Key): E? = datastore[key]?.let(block = ::create)
+
+    /**
+     * [get] returns a sequence of entities with the given [keys].
+     * The caller of the method needs to ensure that the key actually corresponds to this table,
+     * otherwise the behavior is unspecified.
+     */
+    operator fun get(keys: Iterable<Key>): Sequence<E> =
+            datastore[keys].asSequence().map(transform = ::create)
 
     /**
      * [get] returns the entity with the given [key].
+     * The caller of the method needs to ensure that the key actually corresponds to this table,
+     * otherwise the behavior is unspecified.
      * If no such entity is found, it will throw an [IllegalArgumentException]
      */
     fun getNotNull(key: Key): E = get(key = key).let { checkNotNull(value = it) }
@@ -38,6 +51,14 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * [contains] tests whether an entity with given [key] exists in the datastore.
      */
     operator fun contains(key: Key): Boolean = datastore[key] != null
+
+    /**
+     * [allKeys] simply returns all keys without any restrictions.
+     */
+    fun allKeys(): Sequence<Key> =
+            Query.newKeyQueryBuilder().setKind(table.tableName).build()
+                    .let { datastore.run(it) }
+                    .asSequence()
 
     /**
      * [any] tests and returns whether there exists any entity as specified by the query in
@@ -55,12 +76,10 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     fun all(): Sequence<E> = query(builder = {})
 
     /**
-     * [allKeys] simply returns all keys without any restrictions.
+     * [allDescenders] returns all entities which is the descender of the given [ancestor]'s key,
+     * without any other restrictions.
      */
-    fun allKeys(): Sequence<Key> =
-            Query.newKeyQueryBuilder().setKind(table.tableName).build()
-                    .let { datastore.run(it) }
-                    .asSequence()
+    fun allDescenders(ancestor: Key): Sequence<E> = query(ancestor = ancestor)
 
     /**
      * [query] uses the given query builder [builder] to construct a query and returns the result
@@ -161,19 +180,20 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
             entity?.let { update(entity = it, builder = builder) } ?: insert(builder = builder)
 
     /**
-     * [delete] deletes the given [entities] from the datastore.
+     * [delete] deletes the entity with the given [key].
+     * There is no restriction on the type of the entity backed by the key.
      */
-    fun delete(vararg entities: TypedEntity<Tbl>): Unit =
-            datastore.delete(*entities.map(transform = TypedEntity<Tbl>::key).toTypedArray())
+    fun delete(key: Key): Unit = datastore.delete(key)
 
     /**
-     * [delete] deletes the entities with given [keys] from the datastore.
+     * [delete] deletes a collection of entities with the specified collection of [keys].
+     * There is no restriction on the types of the entities backed by the keys.
      */
-    fun delete(vararg keys: Key): Unit = datastore.delete(*keys)
+    fun delete(keys: Collection<Key>): Unit = DatastoreVarargAdapter.delete(datastore, keys)
 
     /**
      * [deleteAll] deletes all entities in this table.
      */
-    fun deleteAll(): Unit = delete(*allKeys().toList().toTypedArray())
+    fun deleteAll(): Unit = delete(keys = allKeys().toList())
 
 }
