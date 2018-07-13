@@ -1,7 +1,7 @@
-package typestore.simple
+package typedstore.simple
 
-import typestore.TypedEntity
-import typestore.TypedEntityCompanion
+import typedstore.TypedEntity
+import typedstore.TypedEntityCompanion
 import com.google.cloud.datastore.Entity
 import java.time.LocalDateTime
 

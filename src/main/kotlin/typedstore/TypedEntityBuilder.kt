@@ -1,20 +1,20 @@
-package typestore
+package typedstore
 
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.LatLng
 import com.google.cloud.datastore.StringValue
-import typestore.PropertyType.BLOB
-import typestore.PropertyType.BOOL
-import typestore.PropertyType.DATE_TIME
-import typestore.PropertyType.DOUBLE
-import typestore.PropertyType.ENUM
-import typestore.PropertyType.KEY
-import typestore.PropertyType.LAT_LNG
-import typestore.PropertyType.LONG
-import typestore.PropertyType.LONG_STRING
-import typestore.PropertyType.STRING
+import typedstore.PropertyType.BLOB
+import typedstore.PropertyType.BOOL
+import typedstore.PropertyType.DATE_TIME
+import typedstore.PropertyType.DOUBLE
+import typedstore.PropertyType.ENUM
+import typedstore.PropertyType.KEY
+import typedstore.PropertyType.LAT_LNG
+import typedstore.PropertyType.LONG
+import typedstore.PropertyType.LONG_STRING
+import typedstore.PropertyType.STRING
 import java.time.LocalDateTime
 
 /**

@@ -1,6 +1,6 @@
-package typestore.simple
+package typedstore.simple
 
-import typestore.TypedTable
+import typedstore.TypedTable
 
 /**
  * [SimpleTable] is a very simple table just to test whether the system works.

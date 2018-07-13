@@ -1,10 +1,10 @@
-package typestore.simple
+package typedstore.simple
 
 import com.google.cloud.datastore.Key
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
-import typestore.nowInUTC
+import typedstore.nowInUTC
 
 /**
  * [SimpleIntegrationTest] tests how different parts of the typed-wrappers can work together by

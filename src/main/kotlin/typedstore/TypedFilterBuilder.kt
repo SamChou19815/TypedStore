@@ -1,18 +1,18 @@
-package typestore
+package typedstore
 
 import com.google.cloud.datastore.Blob
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter.and
 import com.google.cloud.datastore.StructuredQuery.Filter
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter
-import typestore.PropertyType.BLOB
-import typestore.PropertyType.BOOL
-import typestore.PropertyType.DATE_TIME
-import typestore.PropertyType.DOUBLE
-import typestore.PropertyType.ENUM
-import typestore.PropertyType.KEY
-import typestore.PropertyType.LONG
-import typestore.PropertyType.STRING
+import typedstore.PropertyType.BLOB
+import typedstore.PropertyType.BOOL
+import typedstore.PropertyType.DATE_TIME
+import typedstore.PropertyType.DOUBLE
+import typedstore.PropertyType.ENUM
+import typedstore.PropertyType.KEY
+import typedstore.PropertyType.LONG
+import typedstore.PropertyType.STRING
 import java.time.LocalDateTime
 
 /**

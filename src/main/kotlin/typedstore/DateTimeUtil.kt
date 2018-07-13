@@ -1,4 +1,4 @@
-package typestore
+package typedstore
 
 import com.google.cloud.Timestamp
 import java.time.Instant

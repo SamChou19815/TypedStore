@@ -1,4 +1,4 @@
-package typestore
+package typedstore
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.NoCredentials

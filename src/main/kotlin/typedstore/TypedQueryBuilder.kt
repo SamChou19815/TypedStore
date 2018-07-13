@@ -1,4 +1,4 @@
-package typestore
+package typedstore
 
 import com.google.cloud.datastore.EntityQuery
 import com.google.cloud.datastore.Query

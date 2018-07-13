@@ -1,4 +1,4 @@
-package typestore
+package typedstore
 
 import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.Entity

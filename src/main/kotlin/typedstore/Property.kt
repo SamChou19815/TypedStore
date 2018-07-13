@@ -1,6 +1,6 @@
-package typestore
+package typedstore
 
-import typestore.PropertyType.ENUM
+import typedstore.PropertyType.ENUM
 
 /**
  * [Property] represents a property in the entity with a specified type.

@@ -1,4 +1,4 @@
-package typestore
+package typedstore
 
 /**
  * [PropertyType] represents a set of supported types in GCP Datastore in their not-nullable form.
