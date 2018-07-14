@@ -64,8 +64,7 @@ class SimpleIntegrationTest {
                 table.simpleDate gets nowInUTC()
                 table.simpleEnum gets SimpleEnum.B
             }
-            val size = batchUpdate(entities = entities) { table.simpleProp gets 10 }.size
-            assertEquals(2, size)
+            batchUpdate(entities = entities) { table.simpleProp gets 10 }
         }
     }
 

@@ -16,7 +16,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-    compile 'com.github.SamChou19815:TypedStore:0.4.0'
+    compile 'com.github.SamChou19815:TypedStore:0.5.0'
 }
 ```
 

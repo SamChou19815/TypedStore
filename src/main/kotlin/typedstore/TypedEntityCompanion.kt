@@ -166,10 +166,10 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     /**
      * [batchInsert] inserts a collection of entities built from an optional [parent], collection of
      * source data in [source] and a [builder].
-     * It returns a list of newly created entities.
+     * It returns a list of newly created entities' keys.
      */
     fun <T : Any> batchInsert(
-            parent: Key? = null, source: Iterable<T>,
+            parent: Key? = null, source: List<T>,
             builder: TypedEntityBuilder<Tbl, E>.(T) -> Unit
     ): List<E> {
         val newEntities = source.map { s ->
@@ -177,7 +177,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
                     .apply { builder(s) }
                     .buildEntity()
         }
-        return datastore.add(*newEntities.toTypedArray()).map { create(entity = it) }
+        return DatastoreVarargAdapter.add(datastore, newEntities).map(transform = ::create)
     }
 
     /**
@@ -195,16 +195,38 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     }
 
     /**
-     * [batchUpdate] updates a list of [entities] with the specified [builder] and returns a list
-     * of the updated entities.
+     * [batchUpdate] updates a list of [entities] with the specified [builder].
      */
-    fun batchUpdate(entities: List<E>, builder: TypedEntityBuilder<Tbl, E>.(E) -> Unit): List<E> {
+    fun batchUpdate(entities: List<E>, builder: TypedEntityBuilder<Tbl, E>.(E) -> Unit) {
         val updatedEntities = entities.map { e ->
             TypedEntityBuilder(table = table, existingEntity = e)
                     .apply { builder(e) }
                     .buildEntity()
         }
-        return datastore.put(*updatedEntities.toTypedArray()).map { create(entity = it) }
+        DatastoreVarargAdapter.put(datastore, updatedEntities)
+    }
+
+    /**
+     * [batchUpdate] updates a list of [entities] according to a list of [source] with the specified
+     * [builder].
+     *
+     * Requires: [entities] and [source] must have the same size.
+     */
+    fun <T : Any> batchUpdate(
+            entities: List<E>, source: List<T>,
+            builder: TypedEntityBuilder<Tbl, E>.(T) -> Unit
+    ) {
+        val len = entities.size
+        if (len != source.size) {
+            throw IllegalArgumentException("Entity-source size mismatch!")
+        }
+        val updatedEntities = ArrayList<Entity>(len)
+        for (i in 0 until len) {
+            TypedEntityBuilder(table = table, existingEntity = entities[i])
+                    .apply { builder(source[i]) }
+                    .let { updatedEntities.add(element = it.buildEntity()) }
+        }
+        DatastoreVarargAdapter.put(datastore, updatedEntities)
     }
 
     /**
