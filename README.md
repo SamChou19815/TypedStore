@@ -16,7 +16,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-    compile 'com.github.SamChou19815:TypedStore:0.3.0'
+    compile 'com.github.SamChou19815:TypedStore:0.4.0'
 }
 ```
 
@@ -88,7 +88,9 @@ val entities = FooEntity.query {
   filter {
     table.answer42 eq 42
   }
-  FooTable.answer42.desc()
+  order {
+    table.answer42.desc()
+  }
   withLimit(limit = 3)
 }.toList()
 // Update
@@ -111,6 +113,11 @@ this way and simply use it. The code for transaction is put inside the inlined l
 ```kotlin
 inline fun <reified T> transaction(crossinline f: () -> T): T = datastore.transaction(f)
 ```
+
+### Gson Integration
+
+We also provided Gson integration. You can safely keep `Key` and `Cursor` in your class and use the
+type adapter `KeyTypeAdapter` and `CursorTypeAdapter` in package `typedstore.gson`.
 
 ### More Examples
 

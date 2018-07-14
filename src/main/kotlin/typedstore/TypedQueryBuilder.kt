@@ -19,9 +19,14 @@ class TypedQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(val table: T
             Query.newEntityQueryBuilder().setKind(table.tableName)
 
     /**
-     * Internally used typed filter for DSL.
+     * The internally used typed filter builder for DSL.
      */
     private val typedFilterBuilder: TypedFilterBuilder<Tbl> = TypedFilterBuilder()
+
+    /**
+     * The internally used typed order builder for DSL.
+     */
+    private val typedOrderBuilder: TypedOrderBuilder<Tbl> = TypedOrderBuilder(backingBuilder)
 
     /**
      * [filter] starts a filter DSL.
@@ -31,26 +36,17 @@ class TypedQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(val table: T
     fun filter(config: TypedFilterBuilder<Tbl>.() -> Unit): Unit = typedFilterBuilder.config()
 
     /**
-     * [asc] sets the order on this property in ascending order.
-     * It will reset previously set order, if any.
+     * [order] starts a order DSL.
+     *
+     * All orders declared in order will be merged according to the sequence of declaration.
      */
-    fun Property<Tbl, *>.asc() {
-        backingBuilder.setOrderBy(OrderBy.asc(name))
-    }
-
-    /**
-     * [desc] sets the order on this property in descending order.
-     * It will reset previously set order, if any.
-     */
-    fun Property<Tbl, *>.desc() {
-        backingBuilder.setOrderBy(OrderBy.desc(name))
-    }
+    fun order(config: TypedOrderBuilder<Tbl>.() -> Unit): Unit = typedOrderBuilder.config()
 
     /**
      * [withLimit] sets the limit.
      * It will reset previously set limit, if any.
      */
-    fun withLimit(limit: Int) {
+    infix fun withLimit(limit: Int) {
         backingBuilder.setLimit(limit)
     }
 

@@ -32,8 +32,10 @@ class SimpleIntegrationTest {
                 table.simpleDate.isPast()
                 table.simpleEnum eq SimpleEnum.A
             }
-            table.simpleProp.desc()
-            table.simpleDate.asc()
+            order {
+                table.simpleProp.desc()
+                table.simpleDate.asc()
+            }
             withLimit(limit = 100)
         }.first()
         assertEquals(objFromKey.simpleProp, objFromQuery.simpleProp)

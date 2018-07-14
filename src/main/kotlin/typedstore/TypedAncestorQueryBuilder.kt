@@ -4,7 +4,6 @@ import com.google.cloud.datastore.Cursor
 import com.google.cloud.datastore.EntityQuery
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.Query
-import com.google.cloud.datastore.StructuredQuery.OrderBy
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter.hasAncestor
 
 /**
@@ -15,7 +14,7 @@ import com.google.cloud.datastore.StructuredQuery.PropertyFilter.hasAncestor
  * @param ancestor the ancestor key to match.
  */
 class TypedAncestorQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(
-        table: Tbl, ancestor: Key
+        val table: Tbl, ancestor: Key
 ) {
 
     /**
@@ -25,20 +24,16 @@ class TypedAncestorQueryBuilder<Tbl : TypedTable<Tbl>> internal constructor(
             Query.newEntityQueryBuilder().setKind(table.tableName).setFilter(hasAncestor(ancestor))
 
     /**
-     * [asc] sets the order on this property in ascending order.
-     * It will reset previously set order, if any.
+     * The internally used typed order builder for DSL.
      */
-    fun Property<Tbl, *>.asc() {
-        backingBuilder.setOrderBy(OrderBy.asc(name))
-    }
+    private val typedOrderBuilder: TypedOrderBuilder<Tbl> = TypedOrderBuilder(backingBuilder)
 
     /**
-     * [desc] sets the order on this property in descending order.
-     * It will reset previously set order, if any.
+     * [order] starts a order DSL.
+     *
+     * All orders declared in order will be merged according to the sequence of declaration.
      */
-    fun Property<Tbl, *>.desc() {
-        backingBuilder.setOrderBy(OrderBy.desc(name))
-    }
+    fun order(config: TypedOrderBuilder<Tbl>.() -> Unit): Unit = typedOrderBuilder.config()
 
     /**
      * [withLimit] sets the limit.
