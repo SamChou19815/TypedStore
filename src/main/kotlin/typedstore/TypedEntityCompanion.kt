@@ -98,11 +98,13 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
 
     /**
      * [queryCursored] uses the given query builder [builder] to construct a query and returns the
-     * result in sequence along with a cursor after.
+     * result in list along with a cursor after.
      */
-    fun queryCursored(builder: TypedQueryBuilder<Tbl>.() -> Unit): Pair<Sequence<E>, Cursor> {
+    fun queryCursored(builder: TypedQueryBuilder<Tbl>.() -> Unit): Pair<List<E>, Cursor> {
         val result = queryRaw(builder = builder)
-        return result.asSequence().map(transform = ::create) to result.cursorAfter
+        val entities = result.asSequence().map(transform = ::create).toList()
+        val cursorAfter = result.cursorAfter
+        return entities to cursorAfter
     }
 
     /**
@@ -130,13 +132,15 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
 
     /**
      * [queryCursored] uses the given [ancestor] key and the given query builder [builder] to
-     * construct a query and returns the result in sequence along with a cursor after.
+     * construct a query and returns the result in list along with a cursor after.
      */
     fun queryCursored(
             ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}
-    ): Pair<Sequence<E>, Cursor> {
+    ): Pair<List<E>, Cursor> {
         val result = queryRaw(ancestor = ancestor, builder = builder)
-        return result.asSequence().map(transform = ::create) to result.cursorAfter
+        val entities = result.asSequence().map(transform = ::create).toList()
+        val cursorAfter = result.cursorAfter
+        return entities to cursorAfter
     }
 
     /**
