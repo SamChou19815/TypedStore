@@ -84,7 +84,7 @@ class TypedEntityBuilder<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>> private co
      * If some fields are not properly declared, an [IllegalStateException] will be thrown.
      */
     internal fun buildEntity(): Entity =
-            partialBuilder.takeIf { unusedProperties.isNotEmpty() }
+            partialBuilder.takeIf { unusedProperties.isEmpty() }
                     ?.build()
                     ?: throw IllegalStateException("Some property has not been declared.")
 
