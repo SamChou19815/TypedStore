@@ -4,9 +4,9 @@ A declarative and type-safe client library for GCP Datastore.
 
 ## Gradle Config
 
-[![Release](https://jitpack.io/v/SamChou19815/TypedStore.svg)](https://jitpack.io/#SamChou19815/TypedStore)
+[![Release](https://jitpack.io/v/SamChou19815/typed-store.svg)](https://jitpack.io/#SamChou19815/typed-store)
 
-Read the docs [here](http://docs.developersam.com/typed-store/)
+Read the docs [here](https://docs.developersam.com/typed-store/)
 
 Add this to your `build.gradle` to use the artifact.
 
@@ -16,7 +16,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-    compile 'com.github.SamChou19815:TypedStore:0.6.0'
+    compile 'com.github.SamChou19815:typed-store:0.6.1'
 }
 ```
 
@@ -52,7 +52,7 @@ object FooTable : TypedTable<FooTable>() {
 ```
 
 You can see all the supported data types in the 
-[TypedTable](./src/main/kotlin/typestore/TypedTable.kt) class.
+[TypedTable](./src/main/kotlin/typedstore/TypedTable.kt) class.
 
 ### Declaring an Entity with Its Companion
 
@@ -80,17 +80,13 @@ val obj = FooEntity.insert {
     table.bar gets "haha"
     // The second way of setting things
     this[FooTable.answer42] = 42
-    // The type system ensures it[BarTable.bar] = 42 is a compile time error.
+    // The type system ensures `this[BarTable.bar] = 42` is a compile time error.
 }
 // Read
 val entities = FooEntity.query { 
   // filter, order, and limit are all optional
-  filter {
-    table.answer42 eq 42
-  }
-  order {
-    table.answer42.desc()
-  }
+  filter { table.answer42 eq 42 }
+  order { table.answer42.desc() }
   withLimit(limit = 3)
 }.toList()
 // Update
@@ -101,9 +97,9 @@ fun d() = FooEntity.delete(updated.key)
 
 Notes: 
 - You can see a list of all supported DB operations in the 
-[TypedEntityCompanion](./src/main/kotlin/typestore/TypedEntityCompanion.kt) class.
+[TypedEntityCompanion](./src/main/kotlin/typedstore/TypedEntityCompanion.kt) class.
 - You can see a list of all supported filters in the 
-[TypedFilter](./src/main/kotlin/typestore/TypedFilter.kt) class.
+[TypedFilterBuilder](./src/main/kotlin/typedstore/TypedFilterBuilder.kt) class.
 
 ### Transaction
 
