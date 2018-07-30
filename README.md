@@ -1,5 +1,7 @@
 # TypedStore
 
+<img src="https://developersam.com/assets/app-icons/typed-store.png" width="100%" />
+
 A declarative and type-safe client library for GCP Datastore.
 
 ## Gradle Config
