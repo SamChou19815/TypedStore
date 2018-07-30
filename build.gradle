@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.developersam'
-version = '0.1.0'
+version = '0.7.0'
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ dependencies {
     // Test
     testCompile 'junit:junit:4.12'
     // Datastore
-    api 'com.google.cloud:google-cloud-datastore:1.35.0'
+    api 'com.google.cloud:google-cloud-datastore:1.37.1'
     // GSON
     api 'com.google.code.gson:gson:2.8.5'
 }

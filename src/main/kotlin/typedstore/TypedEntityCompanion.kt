@@ -5,7 +5,7 @@ import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.Entity
 import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.PathElement
-import com.google.cloud.datastore.Query
+import com.google.cloud.datastore.ProjectionEntity
 import com.google.cloud.datastore.QueryResults
 
 /**
@@ -20,10 +20,22 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
         private val datastore: Datastore = defaultDatastore, private val table: Tbl
 ) {
 
+    /*
+     * --------------------------------------------------------------------------------
+     * Part 0: Responsibility from Subclasses
+     * --------------------------------------------------------------------------------
+     */
+
     /**
      * [create] creates a [TypedEntity] from an `Entity` from GCP Datastore.
      */
     protected abstract fun create(entity: Entity): E
+
+    /*
+     * --------------------------------------------------------------------------------
+     * Part 1: Reading
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * [get] returns the entity with the given [key] or `null` if it does not exist.
@@ -54,94 +66,156 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
     operator fun contains(key: Key): Boolean = datastore[key] != null
 
     /**
-     * [allKeys] simply returns all keys without any restrictions.
-     */
-    fun allKeys(): Sequence<Key> =
-            Query.newKeyQueryBuilder().setKind(table.tableName).build()
-                    .let { datastore.run(it) }
-                    .asSequence()
-
-    /**
      * [any] tests and returns whether there exists any entity as specified by the query in
-     * [builder].
+     * [builder]. It can also accept an additional [ancestor] as part of the filter.
      */
-    fun any(builder: TypedQueryBuilder<Tbl>.() -> Unit = {}): Boolean =
-            TypedQueryBuilder(table = table).apply(builder)
-                    .build()
-                    .let { datastore.run(it) }
-                    .hasNext()
+    fun any(
+            ancestor: Key? = null, builder: TypedQueryBuilder.ForKey<Tbl>.() -> Unit = {}
+    ): Boolean =
+            TypedQueryBuilder.ForKey(table = table, ancestor = ancestor).apply(builder)
+                    .build().let { datastore.run(it) }.hasNext()
 
     /**
      * [all] simply returns all entities without any restrictions.
+     *
+     * If [ancestor] is supplied, it will return all entities that has the ancestor without any
+     * restriction.
      */
-    fun all(): Sequence<E> = query(builder = {})
+    fun all(ancestor: Key? = null): Sequence<E> = query(ancestor = ancestor) {}
 
     /**
-     * [allDescenders] returns all entities which is the descender of the given [ancestor]'s key,
-     * without any other restrictions.
+     * [allKeys] simply returns all keys without any restrictions.
+     *
+     * It can take an optional parameter [ancestor] as the ancestor key.
      */
-    fun allDescenders(ancestor: Key): Sequence<E> = query(ancestor = ancestor)
+    fun allKeys(ancestor: Key? = null): Sequence<Key> = queryKeys(ancestor = ancestor) {}
 
     /**
-     * [queryRaw] uses the given query builder [builder] to construct a query and returns the raw
-     * query result.
+     * [entityQueryRaw] uses the given entity query builder [builder] to construct a query and
+     * returns the raw entity query result. It can also accept an additional [ancestor] as part of
+     * the filter.
      */
-    private fun queryRaw(builder: TypedQueryBuilder<Tbl>.() -> Unit): QueryResults<Entity> =
-            datastore.run(TypedQueryBuilder(table = table).apply(block = builder).build())
-
-    /**
-     * [query] uses the given query builder [builder] to construct a query and returns the result
-     * in sequence.
-     */
-    fun query(builder: TypedQueryBuilder<Tbl>.() -> Unit): Sequence<E> =
-            queryRaw(builder = builder).asSequence().map(transform = ::create)
-
-    /**
-     * [queryCursored] uses the given query builder [builder] to construct a query and returns the
-     * result in list along with a cursor after.
-     */
-    fun queryCursored(builder: TypedQueryBuilder<Tbl>.() -> Unit): Pair<List<E>, Cursor> {
-        val result = queryRaw(builder = builder)
-        val entities = result.asSequence().map(transform = ::create).toList()
-        val cursorAfter = result.cursorAfter
-        return entities to cursorAfter
-    }
-
-    /**
-     * [queryRaw] uses the given query builder [builder] to construct a query and returns the raw
-     * query result.
-     */
-    /**
-     * [queryRaw] uses the given [ancestor] key and the given query [builder] to construct a query
-     * and returns the raw query result.
-     */
-    private fun queryRaw(
-            ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit
+    private fun entityQueryRaw(
+            ancestor: Key?, builder: TypedQueryBuilder.ForEntity<Tbl>.() -> Unit
     ): QueryResults<Entity> =
-            TypedAncestorQueryBuilder(table = table, ancestor = ancestor)
+            TypedQueryBuilder.ForEntity(table = table, ancestor = ancestor)
                     .apply(block = builder)
                     .build()
                     .let { datastore.run(it) }
 
     /**
-     * [query] uses the given [ancestor] key and the given query [builder] to construct a query and
-     * returns the result in sequence.
+     * [keyQueryRaw] uses the given key query builder [builder] to construct a query and returns the
+     * raw key query result. It can also accept an additional [ancestor] as part of the filter.
      */
-    fun query(ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}): Sequence<E> =
-            queryRaw(ancestor = ancestor, builder = builder).asSequence().map(transform = ::create)
+    private fun keyQueryRaw(
+            ancestor: Key?, builder: TypedQueryBuilder.ForKey<Tbl>.() -> Unit
+    ): QueryResults<Key> =
+            TypedQueryBuilder.ForKey(table = table, ancestor = ancestor)
+                    .apply(block = builder)
+                    .build()
+                    .let { datastore.run(it) }
 
     /**
-     * [queryCursored] uses the given [ancestor] key and the given query builder [builder] to
-     * construct a query and returns the result in list along with a cursor after.
+     * [projectionEntityQueryRaw] uses the given entity query builder [builder] to construct a query
+     * and returns the raw projection entity query result. It can also accept an additional
+     * [ancestor] as part of the filter.
+     *
+     * @param projections the collection contains a non-empty set of properties to select.
+     */
+    private fun projectionEntityQueryRaw(
+            ancestor: Key?, projections: Collection<Property<Tbl, *>>,
+            builder: TypedQueryBuilder.ForProjection<Tbl>.() -> Unit
+    ): QueryResults<ProjectionEntity> =
+            TypedQueryBuilder.ForProjection(
+                    projections = projections, table = table, ancestor = ancestor
+            ).apply(block = builder).build().let { datastore.run(it) }
+
+    /**
+     * [query] uses the given query builder [builder] to construct a query and returns the result
+     * in sequence. It can also accept an additional [ancestor] as part of the filter.
+     */
+    fun query(
+            ancestor: Key? = null, builder: TypedQueryBuilder.ForEntity<Tbl>.() -> Unit
+    ): Sequence<E> =
+            entityQueryRaw(builder = builder, ancestor = ancestor)
+                    .asSequence().map(transform = ::create)
+
+    /**
+     * [queryKeys] uses the given key query builder [builder] to construct a key query and returns
+     * the keys in sequence. It can also accept an additional [ancestor] as part of the filter.
+     */
+    fun queryKeys(
+            ancestor: Key? = null, builder: TypedQueryBuilder.ForKey<Tbl>.() -> Unit
+    ): Sequence<Key> =
+            keyQueryRaw(builder = builder, ancestor = ancestor).asSequence()
+
+    /**
+     * [queryProjections] uses the given projection query builder [builder] to construct a
+     * projection query and returns the result in sequence. It can also accept an additional
+     * [ancestor] as part of the filter.
+     *
+     * @param projections the collection contains a non-empty set of properties to select.
+     */
+    fun queryProjections(
+            ancestor: Key? = null, projections: Collection<Property<Tbl, *>>,
+            builder: TypedQueryBuilder.ForProjection<Tbl>.() -> Unit
+    ): Sequence<ProjectionEntity> =
+            projectionEntityQueryRaw(
+                    ancestor = ancestor, projections = projections, builder = builder
+            ).asSequence()
+
+    /**
+     * [queryCursored] uses the given query builder [builder] to construct a query and returns the
+     * result in list along with a cursor after. It can also accept an additional [ancestor] as part
+     * of the filter.
      */
     fun queryCursored(
-            ancestor: Key, builder: TypedAncestorQueryBuilder<Tbl>.() -> Unit = {}
+            ancestor: Key? = null, builder: TypedQueryBuilder.ForEntity<Tbl>.() -> Unit
     ): Pair<List<E>, Cursor> {
-        val result = queryRaw(ancestor = ancestor, builder = builder)
+        val result = entityQueryRaw(ancestor = ancestor, builder = builder)
         val entities = result.asSequence().map(transform = ::create).toList()
         val cursorAfter = result.cursorAfter
         return entities to cursorAfter
     }
+
+    /**
+     * [queryKeysCursored] uses the given query builder [builder] to construct a query and returns
+     * the keys in list along with a cursor after. It can also accept an additional [ancestor] as
+     * part of the filter.
+     */
+    fun queryKeysCursored(
+            ancestor: Key? = null, builder: TypedQueryBuilder.ForKey<Tbl>.() -> Unit
+    ): Pair<List<Key>, Cursor> {
+        val result = keyQueryRaw(ancestor = ancestor, builder = builder)
+        val keys = result.asSequence().toList()
+        val cursorAfter = result.cursorAfter
+        return keys to cursorAfter
+    }
+
+    /**
+     * [queryProjectionsCursored] uses the given query builder [builder] to construct a query and
+     * returns the projections in list along with a cursor after. It can also accept an additional
+     * [ancestor] as part of the filter.
+     *
+     * @param projections the collection contains a non-empty set of properties to select.
+     */
+    fun queryProjectionsCursored(
+            ancestor: Key? = null, projections: Collection<Property<Tbl, *>>,
+            builder: TypedQueryBuilder.ForProjection<Tbl>.() -> Unit
+    ): Pair<List<ProjectionEntity>, Cursor> {
+        val result = projectionEntityQueryRaw(
+                ancestor = ancestor, projections = projections, builder = builder
+        )
+        val p = result.asSequence().toList()
+        val cursorAfter = result.cursorAfter
+        return p to cursorAfter
+    }
+
+    /*
+     * --------------------------------------------------------------------------------
+     * Part 2: Creation
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * [createNewKey] creates and returns a new key for an new entity, with a nullable [parent] as
@@ -183,6 +257,12 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
         }
         return DatastoreVarargAdapter.add(datastore, newEntities).map(transform = ::create)
     }
+
+    /*
+     * --------------------------------------------------------------------------------
+     * Part 3: Update
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * [update] updates the [entity] with the given [builder], puts the updated one into the
@@ -240,6 +320,12 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      */
     fun upsert(entity: E?, builder: TypedEntityBuilder<Tbl, E>.() -> Unit): E =
             entity?.let { update(entity = it, builder = builder) } ?: insert(builder = builder)
+
+    /*
+     * --------------------------------------------------------------------------------
+     * Part 4: Deletion
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * [delete] deletes the entity with the given [key].

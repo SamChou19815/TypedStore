@@ -1,16 +1,17 @@
 package typedstore
 
-import com.google.cloud.datastore.EntityQuery
-import com.google.cloud.datastore.StructuredQuery
+import com.google.cloud.datastore.StructuredQuery.Builder
+import com.google.cloud.datastore.StructuredQuery.OrderBy
 
 /**
  * [TypedOrderBuilder] is used for order DSL.
  *
- * @param Tbl the type of that table the builder is associated to.
  * @property backingBuilder the reference to the builder in the query builder.
+ * @param Tbl the type of that table the builder is associated to.
+ * @param V the type of the value to query.
  */
-class TypedOrderBuilder<Tbl : TypedTable<Tbl>> internal constructor(
-        private val backingBuilder: EntityQuery.Builder
+class TypedOrderBuilder<Tbl : TypedTable<Tbl>, V> internal constructor(
+        private val backingBuilder: Builder<V>
 ) {
 
     /**
@@ -18,7 +19,7 @@ class TypedOrderBuilder<Tbl : TypedTable<Tbl>> internal constructor(
      * It will reset previously set order, if any.
      */
     fun Property<Tbl, *>.asc() {
-        backingBuilder.addOrderBy(StructuredQuery.OrderBy.asc(name))
+        backingBuilder.addOrderBy(OrderBy.asc(name))
     }
 
     /**
@@ -26,7 +27,7 @@ class TypedOrderBuilder<Tbl : TypedTable<Tbl>> internal constructor(
      * It will reset previously set order, if any.
      */
     fun Property<Tbl, *>.desc() {
-        backingBuilder.addOrderBy(StructuredQuery.OrderBy.desc(name))
+        backingBuilder.addOrderBy(OrderBy.desc(name))
     }
 
 }

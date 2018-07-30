@@ -3,6 +3,7 @@ package typedstore;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
+import com.google.cloud.datastore.ProjectionEntityQuery;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -24,6 +25,38 @@ final class DatastoreVarargAdapter {
      */
     @NotNull
     private static final Entity[] DUMMY_ENTITY_ARRAY = {};
+    
+    /**
+     * Set projections on the given {@code ProjectionEntityQuery.Builder}.
+     *
+     * @param builder the builder to set.
+     * @param properties the properties to select.
+     * @param <Tbl> the type of the table.
+     * @return the set {@code ProjectionEntityQuery.Builder}.
+     * @throws IllegalArgumentException if the given properties are empty.
+     */
+    @NotNull
+    static <Tbl extends TypedTable<Tbl>> ProjectionEntityQuery.Builder setProjections(
+            @NotNull ProjectionEntityQuery.Builder builder,
+            @NotNull Collection<Property<Tbl, ?>> properties
+    ) {
+        int size = properties.size();
+        if (size == 0) {
+            throw new IllegalArgumentException("Empty properties!");
+        }
+        String first = null;
+        String[] others = new String[size - 1];
+        int i = 0;
+        for (Property<Tbl, ?> p : properties) {
+            if (i == 0) {
+                first = p.getName();
+            } else {
+                others[i] = p.getName();
+            }
+            i++;
+        }
+        return builder.setProjection(first, others);
+    }
     
     /**
      * Add a collection of entities to the database.

@@ -11,7 +11,7 @@ import typedstore.PropertyType.ENUM
  * @param T type of the property.
  */
 open class Property<Tbl : TypedTable<Tbl>, T> internal constructor(
-        internal val name: String, internal val type: PropertyType
+        val name: String, internal val type: PropertyType
 ) {
 
     /**

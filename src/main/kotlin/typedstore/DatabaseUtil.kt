@@ -2,9 +2,12 @@ package typedstore
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.NoCredentials
+import com.google.cloud.datastore.BaseEntity
 import com.google.cloud.datastore.Datastore
 import com.google.cloud.datastore.DatastoreException
 import com.google.cloud.datastore.DatastoreOptions
+import com.google.cloud.datastore.Entity
+import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.Transaction
 
 /**
@@ -55,3 +58,10 @@ inline fun <reified T> Datastore.transaction(crossinline f: () -> T): T {
  * datastore.
  */
 inline fun <reified T> transaction(crossinline f: () -> T): T = defaultDatastore.transaction(f)
+
+/**
+ * [safeDelegate] uses function [f] to delegate a value in [entity] with safe property null checks.
+ */
+inline fun <Tbl: TypedTable<Tbl>, T> Property<Tbl, *>.safeDelegate(
+        entity: Entity, crossinline f: (BaseEntity<Key>).(String) -> T
+): T? = entity.takeIf { it.contains(name) }?.takeUnless { it.isNull(name) }?.f(name)

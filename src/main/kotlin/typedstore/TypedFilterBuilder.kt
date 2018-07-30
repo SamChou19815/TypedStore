@@ -5,6 +5,7 @@ import com.google.cloud.datastore.Key
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter
 import com.google.cloud.datastore.StructuredQuery.Filter
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter.hasAncestor
 import typedstore.PropertyType.BLOB
 import typedstore.PropertyType.BOOL
 import typedstore.PropertyType.DATE_TIME
@@ -20,12 +21,12 @@ import java.time.LocalDateTime
  *
  * @param Tbl the type of that table the builder is associated to.
  */
-class TypedFilterBuilder<Tbl : TypedTable<Tbl>> internal constructor() {
+class TypedFilterBuilder<Tbl : TypedTable<Tbl>> internal constructor(ancestor: Key?) {
 
     /**
      * [_backingFilter] is the backing field for the filter builder.
      */
-    private var _backingFilter: Filter? = null
+    private var _backingFilter: Filter? = ancestor?.let { hasAncestor(it) }
 
     /**
      * [backingFilter] is the backing field for the filter builder, accessible for query builder.
