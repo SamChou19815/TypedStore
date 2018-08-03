@@ -20,7 +20,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-    compile 'com.github.SamChou19815:typed-store:0.7.0'
+    compile 'com.github.SamChou19815:typed-store:0.8.0'
 }
 ```
 
@@ -113,11 +113,6 @@ this way and simply use it. The code for transaction is put inside the inlined l
 ```kotlin
 inline fun <reified T> transaction(crossinline f: () -> T): T = datastore.transaction(f)
 ```
-
-### Gson Integration
-
-We also provided Gson integration. You can safely keep `Key` and `Cursor` in your class and use the
-type adapter `KeyTypeAdapter` and `CursorTypeAdapter` in package `typedstore.gson`.
 
 ### More Examples
 
