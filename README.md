@@ -1,12 +1,14 @@
 # TypedStore
 
+![CircleCI branch](https://img.shields.io/circleci/project/github/SamChou19815/typed-store/master.svg)
+![GitHub](https://img.shields.io/github/license/SamChou19815/typed-store.svg)
+[![Release](https://jitpack.io/v/SamChou19815/typed-store.svg)](https://jitpack.io/#SamChou19815/typed-store)
+
 <img src="https://developersam.com/assets/app-icons/typed-store.png" width="100%" />
 
 A declarative and type-safe client library for GCP Datastore.
 
 ## Gradle Config
-
-[![Release](https://jitpack.io/v/SamChou19815/typed-store.svg)](https://jitpack.io/#SamChou19815/typed-store)
 
 Read the docs [here](https://docs.developersam.com/typed-store/)
 
