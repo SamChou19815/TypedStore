@@ -4,11 +4,12 @@ apt:
   packages:
   - google-cloud-sdk
 env:
-- DATASTORE_DATASET=dev-sam
-- DATASTORE_EMULATOR_HOST=127.0.0.1:8081
-- DATASTORE_EMULATOR_HOST_PATH=127.0.0.1:8081/datastore
-- DATASTORE_HOST=http://127.0.0.1:8081
-- DATASTORE_PROJECT_ID=dev-sam
+  global:
+  - DATASTORE_DATASET=dev-sam
+  - DATASTORE_EMULATOR_HOST=127.0.0.1:8081
+  - DATASTORE_EMULATOR_HOST_PATH=127.0.0.1:8081/datastore
+  - DATASTORE_HOST=http://127.0.0.1:8081
+  - DATASTORE_PROJECT_ID=dev-sam
 before_script:
 - gcloud version || true
 - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then
@@ -19,7 +20,7 @@ before_script:
 - source /home/travis/google-cloud-sdk/path.bash.inc
 - gcloud components install cloud-datastore-emulator
 - gcloud config set project dev-sam
-- gcloud beta emulators datastore start
+- gcloud beta emulators datastore start --no-store-on-disk &
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
