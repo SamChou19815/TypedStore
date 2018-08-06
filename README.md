@@ -1,16 +1,16 @@
 # TypedStore
 
-![CircleCI branch](https://img.shields.io/circleci/project/github/SamChou19815/typed-store/master.svg)
-[![Release](https://jitpack.io/v/SamChou19815/typed-store.svg)](https://jitpack.io/#SamChou19815/typed-store)
+[![Build Status](https://travis-ci.com/SamChou19815/sampl.svg?branch=master)](https://travis-ci.com/SamChou19815/typed-store)
+[![Release](https://jitpack.io/v/SamChou19815/sampl.svg)](https://jitpack.io/#SamChou19815/typed-store)
 ![GitHub](https://img.shields.io/github/license/SamChou19815/typed-store.svg)
 
-<img src="https://developersam.com/assets/app-icons/typed-store.png" width="100%" />
+![TypedStore](https://developersam.com/assets/app-icons/typed-store.png)
 
 A declarative and type-safe client library for GCP Datastore.
 
-## Gradle Config
-
 Read the docs [here](https://docs.developersam.com/typed-store/)
+
+## Gradle Config
 
 Add this to your `build.gradle` to use the artifact.
 
@@ -20,7 +20,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-    compile 'com.github.SamChou19815:typed-store:0.8.0'
+    compile 'com.github.SamChou19815:typed-store:+'
 }
 ```
 
