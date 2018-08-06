@@ -1,6 +1,6 @@
 language: java
 dist: trusty
-script:
+before-install:
 - gcloud version || true
 - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then
     rm -rf $HOME/google-cloud-sdk;
@@ -8,7 +8,7 @@ script:
     curl https://sdk.cloud.google.com | bash;
   fi
 - source /home/travis/google-cloud-sdk/path.bash.inc
-- gcloud version
+- gcloud install cloud-datastore-emulator
 - gcloud beta emulators datastore start &
 - $(gcloud beta emulators datastore env-init)
 before_cache:
