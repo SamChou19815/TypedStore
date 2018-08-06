@@ -1,6 +1,9 @@
 language: java
 dist: trusty
-before-install:
+apt:
+  packages:
+  - google-cloud-sdk
+before-script:
 - gcloud version || true
 - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then
     rm -rf $HOME/google-cloud-sdk;
