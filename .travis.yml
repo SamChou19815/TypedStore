@@ -11,7 +11,7 @@ before_script:
     curl https://sdk.cloud.google.com | bash;
   fi
 - source /home/travis/google-cloud-sdk/path.bash.inc
-- gcloud install cloud-datastore-emulator
+- gcloud components install cloud-datastore-emulator
 - gcloud beta emulators datastore start &
 - $(gcloud beta emulators datastore env-init)
 before_cache:
