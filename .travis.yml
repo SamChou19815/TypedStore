@@ -3,7 +3,7 @@ dist: trusty
 apt:
   packages:
   - google-cloud-sdk
-before-script:
+before_script:
 - gcloud version || true
 - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then
     rm -rf $HOME/google-cloud-sdk;
