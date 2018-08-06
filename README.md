@@ -1,7 +1,7 @@
 # TypedStore
 
 [![Build Status](https://travis-ci.com/SamChou19815/sampl.svg?branch=master)](https://travis-ci.com/SamChou19815/typed-store)
-[![Release](https://jitpack.io/v/SamChou19815/sampl.svg)](https://jitpack.io/#SamChou19815/typed-store)
+[![Release](https://jitpack.io/v/SamChou19815/typed-store.svg)](https://jitpack.io/#SamChou19815/typed-store)
 ![GitHub](https://img.shields.io/github/license/SamChou19815/typed-store.svg)
 
 ![TypedStore](https://developersam.com/assets/app-icons/typed-store.png)
