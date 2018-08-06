@@ -12,6 +12,7 @@ before_script:
   fi
 - source /home/travis/google-cloud-sdk/path.bash.inc
 - gcloud components install cloud-datastore-emulator
+- gcloud config set project dev-sam
 - gcloud beta emulators datastore start &
 - $(gcloud beta emulators datastore env-init)
 before_cache:
