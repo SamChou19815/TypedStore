@@ -58,7 +58,7 @@ abstract class TypedEntityCompanion<Tbl : TypedTable<Tbl>, E : TypedEntity<Tbl>>
      * otherwise the behavior is unspecified.
      * If no such entity is found, it will throw an [IllegalArgumentException]
      */
-    fun getNotNull(key: Key): E = get(key = key).let { checkNotNull(value = it) }
+    fun getNotNull(key: Key): E = checkNotNull(value = get(key = key))
 
     /**
      * [contains] tests whether an entity with given [key] exists in the datastore.
