@@ -4,11 +4,7 @@
 [![Release](https://jitpack.io/v/SamChou19815/typed-store.svg)](https://jitpack.io/#SamChou19815/typed-store)
 ![GitHub](https://img.shields.io/github/license/SamChou19815/typed-store.svg)
 
-![TypedStore](https://developersam.com/assets/app-icons/typed-store.png)
-
 A declarative and type-safe client library for GCP Datastore.
-
-Read the docs [here](https://docs.developersam.com/typed-store/)
 
 ## Gradle Config
 
